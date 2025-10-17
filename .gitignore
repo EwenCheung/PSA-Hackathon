@@ -1,0 +1,8 @@
+.codex/
+PSA_Skeleton_plan/
+node_modules/
+.env
+.env.local
+.env.development
+.env.production
+frontend/dist/
