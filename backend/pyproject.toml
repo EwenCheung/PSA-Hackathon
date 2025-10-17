@@ -1,0 +1,8 @@
+[project]
+name = "psa-hackathon"
+version = "0.1.0"
+description = "A short description of my package."
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+]

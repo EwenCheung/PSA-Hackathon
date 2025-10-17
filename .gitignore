@@ -7,3 +7,6 @@ node_modules/
 .env.production
 frontend/dist/
 .gitignore
+AGENTS.md
+data.md
+plan.md
