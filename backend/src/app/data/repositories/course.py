@@ -55,69 +55,84 @@ class CourseRepository(BaseRepository):
         query = f"""
             INSERT INTO {self.TABLE}
             (id, title, description, difficulty, duration_weeks, effort_hours_week,
-            points_reward, roi, url, active)
+             points_reward, roi, url, active)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         data = [
             (c["id"], c["title"], c["description"], c["difficulty"],
-            c["duration_weeks"], c["effort_hours_week"], c["points_reward"],
-            c["roi"], c["url"], c.get("active", 1))
+             c["duration_weeks"], c["effort_hours_week"], c["points_reward"],
+             c["roi"], c["url"], c.get("active", 1))
             for c in courses
         ]
         cur.executemany(query, data)
         self.conn.commit()
         print(f"Synced {len(data)} courses from JSON into {self.TABLE}.")
-        
+
     def get_course(self, course_id: str) -> Optional[dict]:
         """Retrieve a single course by ID."""
-        return self.get_by_id(self.TABLE, self.ID_FIELD, course_id)
+        cur = self.conn.cursor()
+        query = f"SELECT * FROM {self.TABLE} WHERE {self.ID_FIELD} = ?"
+        cur.execute(query, (course_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
 
     def list_courses(self) -> List[dict]:
         """List all active courses."""
+        cur = self.conn.cursor()
         query = f"SELECT * FROM {self.TABLE} WHERE active = 1"
-        return self.fetchall(query)
+        cur.execute(query)
+        return [dict(row) for row in cur.fetchall()]
 
     def search_courses(self, keyword: str) -> List[dict]:
         """Search courses by keyword in title or description."""
+        cur = self.conn.cursor()
         query = f"""
             SELECT * FROM {self.TABLE}
             WHERE (title LIKE ? OR description LIKE ?)
             AND active = 1
         """
         like_term = f"%{keyword}%"
-        return self.fetchall(query, (like_term, like_term))
+        cur.execute(query, (like_term, like_term))
+        return [dict(row) for row in cur.fetchall()]
 
     def filter_by_difficulty(self, difficulty: str) -> List[dict]:
         """List courses filtered by difficulty level."""
+        cur = self.conn.cursor()
         query = f"SELECT * FROM {self.TABLE} WHERE difficulty = ? AND active = 1"
-        return self.fetchall(query, (difficulty,))
+        cur.execute(query, (difficulty,))
+        return [dict(row) for row in cur.fetchall()]
 
     def list_top_courses(self, limit: int = 5) -> List[dict]:
         """List top courses based on points_reward (e.g., for leaderboard or recommendations)."""
+        cur = self.conn.cursor()
         query = f"""
             SELECT * FROM {self.TABLE}
             WHERE active = 1
             ORDER BY points_reward DESC
             LIMIT ?
         """
-        return self.fetchall(query, (limit,))
+        cur.execute(query, (limit,))
+        return [dict(row) for row in cur.fetchall()]
 
     def add_course(self, course: Dict[str, Any]) -> None:
         """Insert a new course record."""
+        cur = self.conn.cursor()
         query = f"""
             INSERT INTO {self.TABLE}
             (id, title, description, difficulty, duration_weeks, effort_hours_week,
              points_reward, roi, url, active)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-        self.execute(query, (
+        cur.execute(query, (
             course["id"], course["title"], course["description"], course["difficulty"],
             course["duration_weeks"], course["effort_hours_week"], course["points_reward"],
             course["roi"], course["url"], course["active"]
         ))
+        self.conn.commit()
 
     def bulk_insert(self, courses: List[Dict[str, Any]]) -> None:
         """Batch insert multiple courses (used for seeding from JSON)."""
+        cur = self.conn.cursor()
         query = f"""
             INSERT INTO {self.TABLE}
             (id, title, description, difficulty, duration_weeks, effort_hours_week,
@@ -130,14 +145,19 @@ class CourseRepository(BaseRepository):
              c["roi"], c["url"], c.get("active", 1))
             for c in courses
         ]
-        self.executemany(query, data)
+        cur.executemany(query, data)
+        self.conn.commit()
 
     def deactivate_course(self, course_id: str) -> None:
         """Deactivate a course (soft delete)."""
+        cur = self.conn.cursor()
         query = f"UPDATE {self.TABLE} SET active = 0 WHERE {self.ID_FIELD} = ?"
-        self.execute(query, (course_id,))
+        cur.execute(query, (course_id,))
+        self.conn.commit()
 
     def delete_course(self, course_id: str) -> None:
         """Permanently delete a course (use with caution)."""
+        cur = self.conn.cursor()
         query = f"DELETE FROM {self.TABLE} WHERE {self.ID_FIELD} = ?"
-        self.execute(query, (course_id,))
+        cur.execute(query, (course_id,))
+        self.conn.commit()
