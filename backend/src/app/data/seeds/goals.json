@@ -1,0 +1,38 @@
+[
+  {
+    "employee_id": "EMP001",
+    "title": "Become Tech Lead",
+    "target_date": "2025-12-31",
+    "progress_percent": 60
+  },
+  {
+    "employee_id": "EMP001",
+    "title": "Complete ML Certification",
+    "target_date": "2025-09-30",
+    "progress_percent": 40
+  },
+  {
+    "employee_id": "EMP002",
+    "title": "Optimize Logistics Process",
+    "target_date": "2025-08-15",
+    "progress_percent": 75
+  },
+  {
+    "employee_id": "EMP003",
+    "title": "Master Machine Learning",
+    "target_date": "2026-03-01",
+    "progress_percent": 30
+  },
+  {
+    "employee_id": "EMP004",
+    "title": "Build Portfolio Website",
+    "target_date": "2025-07-01",
+    "progress_percent": 50
+  },
+  {
+    "employee_id": "EMP005",
+    "title": "Implement AI HR Tools",
+    "target_date": "2025-11-30",
+    "progress_percent": 20
+  }
+]

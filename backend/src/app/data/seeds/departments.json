@@ -1,0 +1,22 @@
+[
+  {
+    "id": "DEPT001",
+    "name": "Engineering & Technology"
+  },
+  {
+    "id": "DEPT002",
+    "name": "Operations & Logistics"
+  },
+  {
+    "id": "DEPT003",
+    "name": "Business Development"
+  },
+  {
+    "id": "DEPT004",
+    "name": "Human Resources"
+  },
+  {
+    "id": "DEPT005",
+    "name": "Finance & Administration"
+  }
+]
