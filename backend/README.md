@@ -79,6 +79,5 @@ backend/
 - Test scaffolding for repositories, services, and API (pytest)
 - TDD-first: always write tests before implementation
 
-API → Service → Repository → Database
-
+Frontend -> API -> services -> repositories -> database
 ---
