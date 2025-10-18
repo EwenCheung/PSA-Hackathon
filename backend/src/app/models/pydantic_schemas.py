@@ -150,9 +150,11 @@ class WellbeingMessageBase(BaseModel):
     is_anonymous: int = 0
 
 class WellbeingMessageCreate(BaseModel):
-    """Create model for posting wellbeing messages from frontend"""
-    content: str = Field(..., description="Message content from user")
-    is_anonymous: bool = Field(default=False, description="Whether message is anonymous")
+    """Request payload for wellbeing chat messages."""
+
+    content: str = Field(..., description="Message content from the employee")
+    is_anonymous: bool = Field(default=False, description="Flag indicating anonymous mode")
+    anon_session_id: Optional[str] = Field(default=None, description="Existing anonymous session identifier")
 
 class WellbeingMessageDetail(WellbeingMessageBase):
     pass
@@ -294,11 +296,6 @@ class RedemptionCreate(BaseModel):
 
 class RedemptionDetail(RedemptionBase):
     pass
-
-class RedemptionRequest(BaseModel):
-    """Request model for redeeming marketplace items"""
-    employee_id: str = Field(..., description="Employee ID making the redemption")
-    item_id: str = Field(..., description="Marketplace item ID to redeem")
 
 # --- PointsLedger ---
 class PointsLedgerBase(BaseModel):
