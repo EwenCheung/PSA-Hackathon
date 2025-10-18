@@ -297,6 +297,11 @@ class RedemptionCreate(BaseModel):
 class RedemptionDetail(RedemptionBase):
     pass
 
+class RedemptionRequest(BaseModel):
+    """Request model for redeeming marketplace items"""
+    employee_id: str = Field(..., description="Employee ID making the redemption")
+    item_id: str = Field(..., description="Marketplace item ID to redeem")
+
 # --- PointsLedger ---
 class PointsLedgerBase(BaseModel):
     id: Optional[int]
