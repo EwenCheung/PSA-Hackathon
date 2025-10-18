@@ -7,7 +7,7 @@ load_dotenv()
 # Set your deployment/model info
 DEPLOYMENT = "gpt-4.1-nano"
 API_VERSION = "2025-01-01-preview"
-API_KEY = os.getenv("PRIMARY_API_KEY", "API_KEY_HERE")
+API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "API_KEY_HERE")
 
 url = f"https://psacodesprint2025.azure-api.net/openai/deployments/{DEPLOYMENT}/chat/completions?api-version={API_VERSION}"
 
