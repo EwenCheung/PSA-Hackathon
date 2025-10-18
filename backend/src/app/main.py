@@ -1,11 +1,44 @@
 """
-Application entrypoint (skeleton)
+Application entrypoint for the PSA Future-Ready Workforce API.
 
-Intended to host a FastAPI application in the future, wiring v1 routers:
-- employees, wellbeing, marketplace, analytics, matching
-
-Keep empty for now to avoid external deps during TDD on services.
+Exposes FastAPI routing for employees, wellbeing, marketplace, analytics,
+and mentorship capabilities.
 """
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-APP_DESCRIPTION = "Future-Ready Workforce Agent Platform API (skeleton)"
+from app.api.v1 import wellbeing
 
+APP_DESCRIPTION = "Future-Ready Workforce Agent Platform API"
+
+app = FastAPI(
+  title="PSA Future-Ready Workforce Platform",
+  description=APP_DESCRIPTION,
+  version="0.1.0",
+  docs_url="/docs",
+  redoc_url="/redoc",
+)
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
+
+app.include_router(wellbeing.router)
+
+
+@app.get("/", tags=["Health"])
+def root() -> dict:
+  return {
+    "status": "ok",
+    "message": "PSA Future-Ready Workforce Platform API is running",
+    "version": "0.1.0",
+  }
+
+
+@app.get("/health", tags=["Health"])
+def health_check() -> dict:
+  return {"status": "healthy"}

@@ -1,48 +1,40 @@
 """
-API: Wellbeing
+API v1: Wellbeing Router
 
 Purpose
 - Support anonymous-friendly chat, message history, and sentiment snapshot.
-
-Routes (contracts only; implemented later via FastAPI):
-- GET /api/v1/wellbeing/{employee_id}/messages
-- POST /api/v1/wellbeing/{employee_id}/messages
-- GET /api/v1/wellbeing/{employee_id}/sentiment
 """
+from typing import Optional
 
-from typing import List
-from app.models.pydantic_schemas import WellbeingMessageDetail, SentimentSnapshotDetail
+from fastapi import APIRouter
 
+from ...agent.well_being_agent.agent import well_being_agent
+from pydantic import BaseModel, Field, AliasChoices
 
-EXPECTED_ROUTES: List[str] = [
-    "/api/v1/wellbeing/{employee_id}/messages",
-    "/api/v1/wellbeing/{employee_id}/sentiment",
-]
+class WellbeingMessageRequest(BaseModel):
+    message: str
+    is_anonymous: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("is_anonymous", "isAnonymous"),
+    )
+    anon_session_id: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("anon_session_id", "anonSessionId"),
+    )
 
+    model_config = {"populate_by_name": True}
 
-def list_messages(employee_id: str) -> List[WellbeingMessageDetail]:
-    """
-    Contract: return message history for employee.
-    Returns: List[WellbeingMessageDetail]
-    """
-    # Placeholder
-    raise NotImplementedError
-
-
-def post_message(employee_id: str, content: str, is_anonymous: bool = False) -> WellbeingMessageDetail:
-    """
-    Contract: record user message and return AI response.
-    Returns: WellbeingMessageDetail
-    """
-    # Placeholder
-    raise NotImplementedError
+router = APIRouter(
+    prefix="/api/v1/wellbeing",
+    tags=["Wellbeing"],
+)
 
 
-def get_sentiment(employee_id: str) -> SentimentSnapshotDetail:
-    """
-    Contract: return latest sentiment label and trend.
-    Returns: SentimentSnapshotDetail
-    """
-    # Placeholder
-    raise NotImplementedError
+@router.get("/{employee_id}/messages_past_10_history")
+async def get_messages(employee_id: str):
+    return well_being_agent.get_messages(employee_id)
 
+
+@router.post("/{employee_id}/messages")
+async def post_message(employee_id: str, req: WellbeingMessageRequest):
+    return well_being_agent.post_message(employee_id, req)

@@ -15,8 +15,7 @@ import os
 DEPLOYMENT = os.getenv("DEPLOYMENT")
 API_VERSION = os.getenv("API_VERSION")
 URL = f"https://psacodesprint2025.azure-api.net/openai/deployments/{DEPLOYMENT}/chat/completions?api-version={API_VERSION}"
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-os.environ["AZURE_OPENAI_ENDPOINT"] = URL
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 
 
 # https://python.langchain.com/docs/integrations/chat/azure_chat_openai/
@@ -75,4 +74,5 @@ response =agent.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
 )
 
-print("Agent Response:", response.messages.content)
+# print("Agent Response:", response.messages.content)
+print("Agent Response:", response)

@@ -150,12 +150,11 @@ class WellbeingMessageBase(BaseModel):
     is_anonymous: int = 0
 
 class WellbeingMessageCreate(BaseModel):
-    employee_id: str
-    anon_session_id: Optional[str] = None
-    sender: str
-    content: str
-    timestamp: str
-    is_anonymous: int = 0
+    """Request payload for wellbeing chat messages."""
+
+    content: str = Field(..., description="Message content from the employee")
+    is_anonymous: bool = Field(default=False, description="Flag indicating anonymous mode")
+    anon_session_id: Optional[str] = Field(default=None, description="Existing anonymous session identifier")
 
 class WellbeingMessageDetail(WellbeingMessageBase):
     pass
