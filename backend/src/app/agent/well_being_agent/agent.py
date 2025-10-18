@@ -10,6 +10,7 @@ from langchain_openai import AzureChatOpenAI
 
 from app.core.config import settings
 from .system_prompt import SYSTEM_PROMPT
+# from .tools import _
 
 load_dotenv()
 _ = settings  # ensure env loaded
