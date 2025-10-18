@@ -1,0 +1,90 @@
+{
+  "timestamp": "2025-10-19T02:23:07.799177",
+  "summary": {
+    "total_tests": 6,
+    "successful": 6,
+    "success_rate": 100.0,
+    "avg_response_length": 292.5,
+    "total_tools_used": 6
+  },
+  "results": [
+    {
+      "test": "\ud83d\udd0d Search: Python Mentors",
+      "success": true,
+      "metrics": {
+        "length": 257,
+        "word_count": 45,
+        "has_data": true,
+        "content_match": 2,
+        "is_helpful": true
+      },
+      "tools_used": 1,
+      "output_length": 257
+    },
+    {
+      "test": "\ud83d\udca1 Recommendation: Specific Employee",
+      "success": true,
+      "metrics": {
+        "length": 403,
+        "word_count": 58,
+        "has_data": true,
+        "content_match": 2,
+        "is_helpful": true
+      },
+      "tools_used": 1,
+      "output_length": 403
+    },
+    {
+      "test": "\ud83d\udc64 Profile: Get Mentor Details",
+      "success": true,
+      "metrics": {
+        "length": 314,
+        "word_count": 53,
+        "has_data": true,
+        "content_match": 3,
+        "is_helpful": true
+      },
+      "tools_used": 1,
+      "output_length": 314
+    },
+    {
+      "test": "\ud83d\udcca Analytics: Program Statistics",
+      "success": true,
+      "metrics": {
+        "length": 274,
+        "word_count": 44,
+        "has_data": true,
+        "content_match": 2,
+        "is_helpful": true
+      },
+      "tools_used": 1,
+      "output_length": 274
+    },
+    {
+      "test": "\u2705 Validation: Goal Quality",
+      "success": true,
+      "metrics": {
+        "length": 258,
+        "word_count": 42,
+        "has_data": true,
+        "content_match": 1,
+        "is_helpful": true
+      },
+      "tools_used": 1,
+      "output_length": 258
+    },
+    {
+      "test": "\ud83c\udfaf Analysis: Skill Gaps",
+      "success": true,
+      "metrics": {
+        "length": 249,
+        "word_count": 45,
+        "has_data": true,
+        "content_match": 1,
+        "is_helpful": true
+      },
+      "tools_used": 1,
+      "output_length": 249
+    }
+  ]
+}

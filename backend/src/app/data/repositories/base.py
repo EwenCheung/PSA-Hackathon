@@ -7,9 +7,16 @@ import sqlite3
 
 T = TypeVar("T")
 
+def dict_factory(cursor, row):
+    """Convert sqlite3.Row to dict"""
+    fields = [column[0] for column in cursor.description]
+    return {key: value for key, value in zip(fields, row)}
+
 class BaseRepository(Generic[T]):
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
+        # Set row_factory to return dicts
+        self.conn.row_factory = sqlite3.Row
 
     def get_by_id(self, table: str, id_field: str, id_value: Any) -> Optional[dict]:
         cur = self.conn.cursor()

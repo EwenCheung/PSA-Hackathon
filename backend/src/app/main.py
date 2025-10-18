@@ -2,7 +2,7 @@
 Application entrypoint
 
 FastAPI application wiring v1 routers:
-- employees, wellbeing, marketplace, sample
+- employees, wellbeing, marketplace, sample, mentoring
 
 The actual route handlers are defined in api/v1/ modules.
 This file just creates the app and includes the routers.
@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from app.api.v1 import employees, wellbeing, marketplace, sample
+from app.api.v1 import employees, wellbeing, marketplace, sample, mentoring
 from app.core.config import settings
 
 APP_DESCRIPTION = "Future-Ready Workforce Agent Platform API"
@@ -39,6 +39,19 @@ app.include_router(employees.router)
 app.include_router(wellbeing.router)
 app.include_router(marketplace.router)
 app.include_router(sample.router)  # Example router showing the pattern
+app.include_router(mentoring.router)  # Mentoring feature
+
+
+# Startup event - seed database with test data
+@app.on_event("startup")
+async def startup_event():
+    """Run on application startup"""
+    try:
+        from app.core.seed_data import seed_test_data
+        seed_test_data()
+    except Exception as e:
+        # Don't crash if seeding fails (might already be seeded)
+        print(f"⚠️  Seed warning: {e}")
 
 
 # Health check endpoints
