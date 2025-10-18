@@ -1,0 +1,57 @@
+[
+  {
+    "course_id": "COURSE001",
+    "skill_id": "SKILL001",
+    "weight": 5
+  },
+  {
+    "course_id": "COURSE001",
+    "skill_id": "SKILL005",
+    "weight": 4
+  },
+  {
+    "course_id": "COURSE002",
+    "skill_id": "SKILL010",
+    "weight": 5
+  },
+  {
+    "course_id": "COURSE002",
+    "skill_id": "SKILL012",
+    "weight": 4
+  },
+  {
+    "course_id": "COURSE002",
+    "skill_id": "SKILL015",
+    "weight": 3
+  },
+  {
+    "course_id": "COURSE003",
+    "skill_id": "SKILL006",
+    "weight": 5
+  },
+  {
+    "course_id": "COURSE003",
+    "skill_id": "SKILL001",
+    "weight": 3
+  },
+  {
+    "course_id": "COURSE004",
+    "skill_id": "SKILL004",
+    "weight": 5
+  },
+  {
+    "course_id": "COURSE004",
+    "skill_id": "SKILL007",
+    "weight": 3
+  },
+  {
+    "course_id": "COURSE005",
+    "skill_id": "SKILL002",
+    "weight": 4
+  },
+  {
+    "course_id": "COURSE005",
+    "skill_id": "SKILL008",
+    "weight": 5
+  }
+]

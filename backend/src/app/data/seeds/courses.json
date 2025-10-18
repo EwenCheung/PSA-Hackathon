@@ -1,0 +1,57 @@
+[
+  {
+    "id": "COURSE001",
+    "title": "Advanced Python for Data Science",
+    "description": "Master Python programming with focus on data analysis, pandas, and numpy.",
+    "difficulty": "Advanced",
+    "duration_weeks": 8,
+    "effort_hours_week": 5,
+    "points_reward": 100,
+    "roi": "High",
+    "active": 1
+  },
+  {
+    "id": "COURSE002",
+    "title": "Leadership Fundamentals",
+    "description": "Build essential leadership skills for managing teams and driving results.",
+    "difficulty": "Intermediate",
+    "duration_weeks": 6,
+    "effort_hours_week": 3,
+    "points_reward": 80,
+    "roi": "Very High",
+    "active": 1
+  },
+  {
+    "id": "COURSE003",
+    "title": "Machine Learning Basics",
+    "description": "Introduction to ML concepts, algorithms, and practical applications.",
+    "difficulty": "Intermediate",
+    "duration_weeks": 10,
+    "effort_hours_week": 6,
+    "points_reward": 120,
+    "roi": "High",
+    "active": 1
+  },
+  {
+    "id": "COURSE004",
+    "title": "Cloud Computing with AWS",
+    "description": "Learn AWS services, architecture, and best practices for cloud deployment.",
+    "difficulty": "Intermediate",
+    "duration_weeks": 8,
+    "effort_hours_week": 4,
+    "points_reward": 100,
+    "roi": "High",
+    "active": 1
+  },
+  {
+    "id": "COURSE005",
+    "title": "React & Modern Frontend",
+    "description": "Build interactive UIs with React, hooks, and modern JavaScript.",
+    "difficulty": "Beginner",
+    "duration_weeks": 6,
+    "effort_hours_week": 4,
+    "points_reward": 70,
+    "roi": "Medium",
+    "active": 1
+  }
+]

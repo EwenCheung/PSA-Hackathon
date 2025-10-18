@@ -9,7 +9,9 @@ Routes (contracts only; implemented later via FastAPI):
 - GET /api/v1/analytics/departments
 - GET /api/v1/analytics/employees
 """
-from typing import Dict, List
+
+from typing import List
+from app.models.pydantic_schemas import DepartmentDetail, EmployeeDetail
 
 
 EXPECTED_ROUTES: List[str] = [
@@ -19,17 +21,29 @@ EXPECTED_ROUTES: List[str] = [
 ]
 
 
-def overview() -> Dict:
-    """Contract: return top-level KPIs for dashboard tiles."""
+def overview() -> dict:
+    """
+    Contract: return top-level KPIs for dashboard tiles.
+    Returns: dict (placeholder)
+    """
+    # Placeholder
     raise NotImplementedError
 
 
-def departments() -> List[Dict]:
-    """Contract: return department aggregates including sentiment."""
+def departments() -> List[DepartmentDetail]:
+    """
+    Contract: return department aggregates including sentiment.
+    Returns: List[DepartmentDetail]
+    """
+    # Placeholder
     raise NotImplementedError
 
 
-def employees() -> List[Dict]:
-    """Contract: return employee rows for detailed cards."""
+def employees() -> List[EmployeeDetail]:
+    """
+    Contract: return employee rows for detailed cards.
+    Returns: List[EmployeeDetail]
+    """
+    # Placeholder
     raise NotImplementedError
 

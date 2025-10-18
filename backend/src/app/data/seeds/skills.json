@@ -1,0 +1,77 @@
+[
+  {
+    "id": "SKILL001",
+    "name": "Python Programming",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL002",
+    "name": "JavaScript",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL003",
+    "name": "SQL & Databases",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL004",
+    "name": "Cloud Computing (AWS/Azure)",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL005",
+    "name": "Data Analysis",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL006",
+    "name": "Machine Learning",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL007",
+    "name": "DevOps & CI/CD",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL008",
+    "name": "React & Frontend",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL009",
+    "name": "API Design",
+    "category": "Technical"
+  },
+  {
+    "id": "SKILL010",
+    "name": "Leadership",
+    "category": "Soft Skills"
+  },
+  {
+    "id": "SKILL011",
+    "name": "Project Management",
+    "category": "Soft Skills"
+  },
+  {
+    "id": "SKILL012",
+    "name": "Communication",
+    "category": "Soft Skills"
+  },
+  {
+    "id": "SKILL013",
+    "name": "Problem Solving",
+    "category": "Soft Skills"
+  },
+  {
+    "id": "SKILL014",
+    "name": "Team Collaboration",
+    "category": "Soft Skills"
+  },
+  {
+    "id": "SKILL015",
+    "name": "Strategic Thinking",
+    "category": "Soft Skills"
+  }
+]

@@ -10,7 +10,9 @@ Routes (contracts only; implemented later via FastAPI):
 - GET /api/v1/matching/suggested
 - POST /api/v1/matching/confirm
 """
-from typing import Dict, List
+
+from typing import List
+from app.models.pydantic_schemas import MentorshipProfileDetail, MentorshipMatchDetail
 
 
 EXPECTED_ROUTES: List[str] = [
@@ -21,22 +23,38 @@ EXPECTED_ROUTES: List[str] = [
 ]
 
 
-def list_mentors() -> List[Dict]:
-    """Contract: return mentors with capacity, expertise, rating."""
+def list_mentors() -> List[MentorshipProfileDetail]:
+    """
+    Contract: return mentors with capacity, expertise, rating.
+    Returns: List[MentorshipProfileDetail]
+    """
+    # Placeholder
     raise NotImplementedError
 
 
-def list_mentees() -> List[Dict]:
-    """Contract: return mentees with goals and personality."""
+def list_mentees() -> List[MentorshipProfileDetail]:
+    """
+    Contract: return mentees with goals and personality.
+    Returns: List[MentorshipProfileDetail]
+    """
+    # Placeholder
     raise NotImplementedError
 
 
-def suggested() -> List[Dict]:
-    """Contract: return suggested pairs with scores and reasons."""
+def suggested() -> List[MentorshipMatchDetail]:
+    """
+    Contract: return suggested pairs with scores and reasons.
+    Returns: List[MentorshipMatchDetail]
+    """
+    # Placeholder
     raise NotImplementedError
 
 
-def confirm(pairs: List[Dict]) -> Dict:
-    """Contract: confirm selected matches and persist state."""
+def confirm(pairs: List[dict]) -> MentorshipMatchDetail:
+    """
+    Contract: confirm selected matches and persist state.
+    Returns: MentorshipMatchDetail
+    """
+    # Placeholder
     raise NotImplementedError
 

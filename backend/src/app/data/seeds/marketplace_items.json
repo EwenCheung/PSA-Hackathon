@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "Coffee Voucher",
+    "description": "Redeem for a free coffee at company café",
+    "points_cost": 50,
+    "category": "Food & Beverage",
+    "in_stock": 1
+  },
+  {
+    "id": 2,
+    "name": "Extra Day Off",
+    "description": "One additional paid day off",
+    "points_cost": 500,
+    "category": "Time Off",
+    "in_stock": 1
+  },
+  {
+    "id": 3,
+    "name": "Learning Budget",
+    "description": "$100 towards books or online courses",
+    "points_cost": 300,
+    "category": "Learning",
+    "in_stock": 1
+  },
+  {
+    "id": 4,
+    "name": "Team Lunch",
+    "description": "Lunch for your team (up to 5 people)",
+    "points_cost": 400,
+    "category": "Food & Beverage",
+    "in_stock": 1
+  },
+  {
+    "id": 5,
+    "name": "Parking Pass (1 Month)",
+    "description": "Premium parking for one month",
+    "points_cost": 200,
+    "category": "Transportation",
+    "in_stock": 1
+  },
+  {
+    "id": 6,
+    "name": "Tech Gadget",
+    "description": "Choice of wireless mouse, keyboard, or headphones",
+    "points_cost": 350,
+    "category": "Tech",
+    "in_stock": 1
+  },
+  {
+    "id": 7,
+    "name": "Wellness Session",
+    "description": "One-on-one session with wellness coach",
+    "points_cost": 150,
+    "category": "Wellness",
+    "in_stock": 1
+  }
+]

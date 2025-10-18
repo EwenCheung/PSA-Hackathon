@@ -1,0 +1,26 @@
+[
+  {
+    "employee_id": "EMP001",
+    "is_mentor": 1,
+    "capacity": 3,
+    "mentees_count": 2,
+    "rating": 4.8,
+    "personality": "Analytical, Patient, Detail-oriented"
+  },
+  {
+    "employee_id": "EMP002",
+    "is_mentor": 1,
+    "capacity": 2,
+    "mentees_count": 1,
+    "rating": 4.5,
+    "personality": "Strategic, Supportive, Results-driven"
+  },
+  {
+    "employee_id": "EMP005",
+    "is_mentor": 1,
+    "capacity": 4,
+    "mentees_count": 2,
+    "rating": 4.9,
+    "personality": "Empathetic, Communicative, Inspiring"
+  }
+]

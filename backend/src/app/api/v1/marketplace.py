@@ -8,7 +8,9 @@ Routes (contracts only; implemented later via FastAPI):
 - GET /api/v1/marketplace/items
 - POST /api/v1/marketplace/redeem
 """
-from typing import Dict, List
+
+from typing import List
+from app.models.pydantic_schemas import MarketplaceItemDetail
 
 
 EXPECTED_ROUTES: List[str] = [
@@ -17,12 +19,20 @@ EXPECTED_ROUTES: List[str] = [
 ]
 
 
-def list_items() -> List[Dict]:
-    """Contract: return available rewards items with stock and points."""
+def list_items() -> List[MarketplaceItemDetail]:
+    """
+    Contract: return available rewards items with stock and points.
+    Returns: List[MarketplaceItemDetail]
+    """
+    # Placeholder
     raise NotImplementedError
 
 
-def redeem(employee_id: str, item_id: str) -> Dict:
-    """Contract: adjust points and record redemption."""
+def redeem(employee_id: str, item_id: str) -> MarketplaceItemDetail:
+    """
+    Contract: adjust points and record redemption.
+    Returns: MarketplaceItemDetail
+    """
+    # Placeholder
     raise NotImplementedError
 

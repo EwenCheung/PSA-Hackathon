@@ -15,14 +15,34 @@ from typing import Iterable, Mapping
 
 
 def get_connection(url: str | None = None) -> sqlite3.Connection:
-    db_url = url or os.getenv("DB_URL", os.path.join(os.path.dirname(__file__), "..", "..", "..", "app.db"))
-    # Normalize relative path
+    """
+    Get SQLite database connection.
+    
+    Args:
+        url: Database URL. Defaults to data/database/app.db or DATABASE_URL env var.
+    
+    Returns:
+        SQLite connection with foreign keys enabled.
+    
+    Note:
+        - Default path: backend/src/app/data/database/app.db
+        - Use ':memory:' for in-memory database (testing)
+        - Creates parent directories automatically
+    """
+    # Default to data/database/app.db (not root level)
+    default_path = os.path.join(os.path.dirname(__file__), "..", "data", "database", "app.db")
+    db_url = url or os.getenv("DATABASE_URL", default_path)
+    
+    # Handle in-memory database for testing
     if db_url == ":memory:":
         conn = sqlite3.connect(db_url)
     else:
-        os.makedirs(os.path.dirname(os.path.abspath(db_url)), exist_ok=True)
-        conn = sqlite3.connect(db_url)
-    # Ensure FK constraints
+        # Create data/database/ directory if it doesn't exist
+        db_path = os.path.abspath(db_url)
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path)
+    
+    # Ensure foreign key constraints are enforced
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
