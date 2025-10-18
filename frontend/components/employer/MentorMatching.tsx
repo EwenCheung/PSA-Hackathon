@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
 import { 
-  Users, CheckCircle2, GitMerge, Award, 
-  Target, TrendingUp, Star, UserPlus 
+  Users, Award, 
+  Target, Star, CheckCircle2, TrendingUp, Calendar
 } from 'lucide-react';
 
 const mentors = [
@@ -71,66 +70,112 @@ const mentees = [
   },
 ];
 
-const matches = [
+const mentorshipPairs = [
   {
-    mentorId: 'EMP005',
-    mentorName: 'David Lee',
-    menteeId: 'EMP001',
-    menteeName: 'Alex Johnson',
-    matchScore: 95,
-    reasons: [
-      'Aligned technical expertise',
-      'Complementary personality traits',
-      'Shared interest in system design',
-    ],
+    id: 'PAIR001',
+    mentor: {
+      id: 'EMP005',
+      name: 'David Lee',
+      role: 'Principal Engineer',
+    },
+    mentee: {
+      id: 'EMP012',
+      name: 'Sarah Martinez',
+      role: 'Mid-level Developer',
+    },
+    startDate: '2025-08-01',
+    focusAreas: ['System Architecture', 'Technical Leadership', 'Career Growth'],
+    status: 'active',
+    progress: 65,
+    nextMeeting: '2025-10-24',
+    sessionsCompleted: 8,
   },
   {
-    mentorId: 'EMP008',
-    mentorName: 'Maria Garcia',
-    menteeId: 'EMP003',
-    menteeName: 'Michael Brown',
-    matchScore: 92,
-    reasons: [
-      'Design expertise alignment',
-      'Similar creative approach',
-      'Mentee goals match mentor strengths',
-    ],
+    id: 'PAIR002',
+    mentor: {
+      id: 'EMP002',
+      name: 'Sarah Chen',
+      role: 'Senior Product Manager',
+    },
+    mentee: {
+      id: 'EMP009',
+      name: 'Jennifer Taylor',
+      role: 'Junior Product Manager',
+    },
+    startDate: '2025-09-01',
+    focusAreas: ['Product Strategy', 'Data Analysis', 'Roadmap Planning'],
+    status: 'active',
+    progress: 45,
+    nextMeeting: '2025-10-22',
+    sessionsCompleted: 5,
   },
   {
-    mentorId: 'EMP002',
-    mentorName: 'Sarah Chen',
-    menteeId: 'EMP009',
-    menteeName: 'Jennifer Taylor',
-    matchScore: 88,
-    reasons: [
-      'Product management focus',
-      'Analytical mindset match',
-      'Career trajectory alignment',
-    ],
+    id: 'PAIR003',
+    mentor: {
+      id: 'EMP008',
+      name: 'Maria Garcia',
+      role: 'Design Lead',
+    },
+    mentee: {
+      id: 'EMP003',
+      name: 'Michael Brown',
+      role: 'Designer',
+    },
+    startDate: '2025-07-15',
+    focusAreas: ['UX Design', 'Design Systems', 'Portfolio Building'],
+    status: 'active',
+    progress: 80,
+    nextMeeting: '2025-10-20',
+    sessionsCompleted: 12,
+  },
+  {
+    id: 'PAIR004',
+    mentor: {
+      id: 'EMP005',
+      name: 'David Lee',
+      role: 'Principal Engineer',
+    },
+    mentee: {
+      id: 'EMP013',
+      name: 'Michael Wong',
+      role: 'Senior Developer',
+    },
+    startDate: '2025-07-01',
+    focusAreas: ['Team Management', 'Stakeholder Communication'],
+    status: 'active',
+    progress: 85,
+    nextMeeting: '2025-10-26',
+    sessionsCompleted: 14,
+  },
+  {
+    id: 'PAIR005',
+    mentor: {
+      id: 'EMP002',
+      name: 'Sarah Chen',
+      role: 'Senior Product Manager',
+    },
+    mentee: {
+      id: 'EMP014',
+      name: 'Lisa Anderson',
+      role: 'Associate Product Manager',
+    },
+    startDate: '2025-06-01',
+    focusAreas: ['Agile Methodology', 'Stakeholder Management'],
+    status: 'completed',
+    progress: 100,
+    nextMeeting: null,
+    sessionsCompleted: 16,
   },
 ];
 
 export default function MentorMatching() {
-  const [selectedMatches, setSelectedMatches] = useState<number[]>([]);
-  const [confirmedMatches, setConfirmedMatches] = useState<number[]>([]);
-
-  const handleSelectMatch = (index: number) => {
-    if (selectedMatches.includes(index)) {
-      setSelectedMatches(selectedMatches.filter(i => i !== index));
-    } else {
-      setSelectedMatches([...selectedMatches, index]);
-    }
-  };
-
-  const handleConfirmMatches = () => {
-    setConfirmedMatches([...confirmedMatches, ...selectedMatches]);
-    setSelectedMatches([]);
-  };
+  const activePairs = mentorshipPairs.filter(pair => pair.status === 'active');
+  const completedPairs = mentorshipPairs.filter(pair => pair.status === 'completed');
 
   return (
     <div className="space-y-6">
       {/* Overview */}
-      <div className="grid md:grid-cols-4 gap-4">
+      <div className="grid md:grid-cols-3 gap-4">
         <Card className="border border-[#D0E8F5]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm text-muted-foreground">Available Mentors</CardTitle>
@@ -155,122 +200,154 @@ export default function MentorMatching() {
 
         <Card className="border border-[#D0E8F5]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm text-muted-foreground">AI Matches</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl text-foreground">{matches.length}</div>
-            <p className="text-sm text-muted-foreground">High-quality suggestions</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-[#D0E8F5]">
-          <CardHeader className="pb-3">
             <CardTitle className="text-sm text-muted-foreground">Active Pairs</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-foreground">18</div>
-            <p className="text-sm text-green-600">↑ 6 this month</p>
+            <div className="text-3xl text-foreground">{activePairs.length}</div>
+            <p className="text-sm text-green-600">↑ {mentorshipPairs.length - completedPairs.length} this quarter</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* AI-Suggested Matches */}
-      <Card className="border border-gray-200">
-        <CardHeader className="border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <GitMerge className="w-5 h-5" />
-                AI-Suggested Mentor Matches
-              </CardTitle>
-              <CardDescription>
-                Based on personality, goals, expertise, and availability
-              </CardDescription>
-            </div>
-            {selectedMatches.length > 0 && (
-              <Button onClick={handleConfirmMatches}>
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Confirm {selectedMatches.length} Match{selectedMatches.length > 1 ? 'es' : ''}
-              </Button>
-            )}
-          </div>
+      {/* Active Mentorship Pairs */}
+      <Card className="border border-[#D0E8F5]">
+        <CardHeader className="border-b border-[#E8F3F9]">
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Active Mentorship Pairs
+          </CardTitle>
+          <CardDescription>Current mentor-mentee relationships and their progress</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {matches.map((match, index) => {
-            const isSelected = selectedMatches.includes(index);
-            const isConfirmed = confirmedMatches.includes(index);
-
-            return (
-              <Card 
-                key={index} 
-                className={`border border-[#D0E8F5] ${isSelected ? 'border-[#4167B1]' : ''} ${isConfirmed ? 'opacity-60' : ''}`}
-              >
-                <CardContent className="pt-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-[#DEF0F9] rounded-full flex items-center justify-center mb-1">
-                          <Users className="w-6 h-6 text-[#4167B1]" />
+        <CardContent className="pt-6 space-y-4">
+          {activePairs.map((pair) => (
+            <Card key={pair.id} className="border border-[#D0E8F5]">
+              <CardContent className="pt-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-[#4167B1] rounded-full flex items-center justify-center mb-1">
+                          <span className="text-white font-semibold">M</span>
                         </div>
-                        <Badge variant="secondary" className="gap-1">
-                          <Star className="w-3 h-3" />
-                          {match.matchScore}%
-                        </Badge>
+                        <p className="text-xs text-muted-foreground">Mentor</p>
                       </div>
                       <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span>{match.mentorName}</span>
-                          <span className="text-gray-400">→</span>
-                          <span>{match.menteeName}</span>
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          Mentor to Mentee pairing
-                        </div>
+                        <p className="font-semibold">{pair.mentor.name}</p>
+                        <p className="text-sm text-muted-foreground">{pair.mentor.role}</p>
+                        <p className="text-xs text-muted-foreground">{pair.mentor.id}</p>
                       </div>
                     </div>
-                    {!isConfirmed && (
-                      <Button
-                        variant={isSelected ? 'default' : 'outline'}
-                        onClick={() => handleSelectMatch(index)}
-                      >
-                        {isSelected ? (
-                          <>
-                            <CheckCircle2 className="w-4 h-4 mr-2" />
-                            Selected
-                          </>
-                        ) : (
-                          <>
-                            <UserPlus className="w-4 h-4 mr-2" />
-                            Select
-                          </>
-                        )}
-                      </Button>
-                    )}
-                    {isConfirmed && (
-                      <Badge variant="secondary" className="gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Confirmed
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm">Match Reasons:</p>
-                    <div className="space-y-1">
-                      {match.reasons.map((reason, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-600" />
-                          <span>{reason}</span>
+                    <div className="text-2xl text-gray-400">→</div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-[#DEF0F9] rounded-full flex items-center justify-center mb-1">
+                          <span className="text-[#4167B1] font-semibold">E</span>
                         </div>
+                        <p className="text-xs text-muted-foreground">Mentee</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold">{pair.mentee.name}</p>
+                        <p className="text-sm text-muted-foreground">{pair.mentee.role}</p>
+                        <p className="text-xs text-muted-foreground">{pair.mentee.id}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    Active
+                  </Badge>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm font-medium mb-2">Focus Areas:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {pair.focusAreas.map((area, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">{area}</Badge>
                       ))}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  <div>
+                    <p className="text-sm font-medium mb-2">Stats:</p>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Started:</span>
+                        <span>{new Date(pair.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        <span className="text-muted-foreground">Sessions:</span>
+                        <span>{pair.sessionsCompleted} completed</span>
+                      </div>
+                      {pair.nextMeeting && (
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <span className="text-muted-foreground">Next:</span>
+                          <span>{new Date(pair.nextMeeting).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Progress
+                    </p>
+                    <span className="text-sm font-semibold text-[#4167B1]">{pair.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-[#4167B1] h-2 rounded-full transition-all"
+                      style={{ width: `${pair.progress}%` }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </CardContent>
       </Card>
+
+      {/* Completed Pairs */}
+      {completedPairs.length > 0 && (
+        <Card className="border border-[#D0E8F5]">
+          <CardHeader className="border-b border-[#E8F3F9]">
+            <CardTitle className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-green-600" />
+              Completed Mentorships
+            </CardTitle>
+            <CardDescription>Successfully completed mentor-mentee relationships</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-3">
+            {completedPairs.map((pair) => (
+              <Card key={pair.id} className="border border-green-200 bg-green-50/50">
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-semibold">{pair.mentor.name}</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold">{pair.mentee.name}</span>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        {pair.sessionsCompleted} sessions
+                      </Badge>
+                    </div>
+                    <Badge variant="secondary" className="bg-green-600 text-white">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Completed
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Available Mentors */}
       <Card className="border border-[#D0E8F5]">

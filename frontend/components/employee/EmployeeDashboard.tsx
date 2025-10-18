@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
-import { LogOut, GraduationCap, MessageCircle, ShoppingBag, User } from 'lucide-react';
+import { LogOut, GraduationCap, MessageCircle, ShoppingBag, User, Users } from 'lucide-react';
 import CareerPath from './CareerPath';
 import ChatSupport from './ChatSupport';
 import Marketplace from './Marketplace';
+import MentorMatching from './MentorMatching';
 import { Badge } from '../ui/badge';
 
 interface EmployeeDashboardProps {
@@ -66,10 +67,14 @@ export default function EmployeeDashboard({ employeeId, onLogout }: EmployeeDash
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
+          <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
             <TabsTrigger value="career" className="gap-2">
               <GraduationCap className="w-4 h-4" />
               Career Path
+            </TabsTrigger>
+            <TabsTrigger value="mentor" className="gap-2">
+              <Users className="w-4 h-4" />
+              Mentor Matching
             </TabsTrigger>
             <TabsTrigger value="wellbeing" className="gap-2">
               <MessageCircle className="w-4 h-4" />
@@ -87,6 +92,13 @@ export default function EmployeeDashboard({ employeeId, onLogout }: EmployeeDash
               employeeData={mockEmployeeData}
               points={points}
               onPointsUpdate={handlePointsUpdate}
+            />
+          </TabsContent>
+
+          <TabsContent value="mentor">
+            <MentorMatching 
+              employeeId={employeeId} 
+              employeeData={mockEmployeeData}
             />
           </TabsContent>
 

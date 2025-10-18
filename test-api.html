@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mentoring API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4167B1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #35528f;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #4167B1;
+            border-radius: 4px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        h1 {
+            color: #4167B1;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Mentoring API Integration Test</h1>
+        <p>Test your backend API endpoints directly from the browser!</p>
+        
+        <div class="section">
+            <h2>🏥 Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+        </div>
+
+        <div class="section">
+            <h2>👥 Mentors</h2>
+            <button onclick="testGetMentors()">Get All Mentors</button>
+            <button onclick="testGetMentor()">Get Specific Mentor (EMP001)</button>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Recommendations</h2>
+            <button onclick="testRecommendations()">Get Mentor Recommendations</button>
+        </div>
+
+        <div class="section">
+            <h2>📝 Requests</h2>
+            <button onclick="testCreateRequest()">Create Mentorship Request</button>
+            <button onclick="testGetRequests()">Get All Requests</button>
+        </div>
+
+        <div class="section">
+            <h2>👫 Pairs</h2>
+            <button onclick="testGetPairs()">Get Mentorship Pairs</button>
+        </div>
+
+        <div class="section">
+            <h2>📊 Statistics</h2>
+            <button onclick="testStatistics()">Get Program Statistics</button>
+        </div>
+
+        <div id="result" class="result" style="display: none;">
+            <h3>Response:</h3>
+            <pre id="output"></pre>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        function showResult(data, isError = false) {
+            const resultDiv = document.getElementById('result');
+            const output = document.getElementById('output');
+            resultDiv.style.display = 'block';
+            
+            if (isError) {
+                output.innerHTML = `<span class="error">❌ ERROR</span>\n${JSON.stringify(data, null, 2)}`;
+            } else {
+                output.innerHTML = `<span class="success">✅ SUCCESS</span>\n${JSON.stringify(data, null, 2)}`;
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testGetMentors() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/mentors`);
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testGetMentor() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/mentors/EMP001`);
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testRecommendations() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/recommend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        employeeId: 'EMP123',
+                        careerGoals: ['Leadership Development', 'Technical Skills'],
+                        desiredSkills: ['Strategic Planning', 'Innovation'],
+                        maxResults: 5
+                    })
+                });
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testCreateRequest() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/request`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        menteeId: 'EMP123',
+                        mentorId: 'EMP001',
+                        message: 'I would love to learn about leadership and strategic planning from you!',
+                        goals: ['Leadership Development', 'Strategic Planning']
+                    })
+                });
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testGetRequests() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/requests`);
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testGetPairs() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/pairs`);
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function testStatistics() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/mentoring/statistics`);
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>
