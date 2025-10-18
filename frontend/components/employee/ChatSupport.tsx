@@ -1,59 +1,117 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
-import { 
-  Send, Heart, AlertCircle, Shield, 
-  Smile, Meh, Frown, MessageCircle 
+import {
+  Send,
+  Heart,
+  AlertCircle,
+  Shield,
+  Smile,
+  Meh,
+  Frown,
+  MessageCircle,
+  Loader2,
 } from 'lucide-react';
+import {
+  fetchWellbeingMessages,
+  sendWellbeingMessage,
+  WellbeingMessage,
+} from '../../src/services/wellbeing';
 
 interface Message {
-  id: number;
+  id: string;
   sender: 'user' | 'ai';
   content: string;
   timestamp: Date;
-  isAnonymous?: boolean;
+  isAnonymous: boolean;
+  anonSessionId?: string | null;
 }
 
 interface ChatSupportProps {
   employeeId: string;
 }
 
+const INITIAL_GREETING: Message = {
+  id: 'greeting',
+  sender: 'ai',
+  content: "Hello! I'm here to support your wellbeing. How are you feeling today? This is a safe, confidential space.",
+  timestamp: new Date(),
+  isAnonymous: false,
+};
+
 export default function ChatSupport({ employeeId }: ChatSupportProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      sender: 'ai',
-      content: "Hello! I'm here to support your wellbeing. How are you feeling today? This is a safe, confidential space.",
-      timestamp: new Date(),
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([INITIAL_GREETING]);
   const [input, setInput] = useState('');
   const [sentiment, setSentiment] = useState<'positive' | 'neutral' | 'negative'>('neutral');
   const [isAnonymousMode, setIsAnonymousMode] = useState(false);
+  const [anonSessionId, setAnonSessionId] = useState<string | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    let active = true;
+    const loadHistory = async () => {
+      setIsLoadingHistory(true);
+      try {
+        const history = await fetchWellbeingMessages(employeeId);
+        if (!active) return;
+        if (history.length === 0) {
+          setMessages([INITIAL_GREETING]);
+          return;
+        }
+        const mapped = history.map(mapToClientMessage);
+        setMessages(mapped);
+
+        const latestAnon = [...mapped]
+          .reverse()
+          .find((message) => message.isAnonymous && message.anonSessionId);
+        if (latestAnon) {
+          setAnonSessionId(latestAnon.anonSessionId ?? null);
+        }
+      } catch (loadError) {
+        if (active) {
+          setError('We could not load your previous wellbeing messages.');
+          setMessages([INITIAL_GREETING]);
+        }
+      } finally {
+        if (active) {
+          setIsLoadingHistory(false);
+        }
+      }
+    };
+
+    loadHistory();
+
+    return () => {
+      active = false;
+    };
+  }, [employeeId]);
 
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Simple sentiment analysis
+  useEffect(() => {
+    if (isAnonymousMode) {
+      setAnonSessionId(null);
+    }
+  }, [isAnonymousMode]);
+
   const analyzeSentiment = (text: string): 'positive' | 'neutral' | 'negative' => {
     const lowerText = text.toLowerCase();
     const negativeWords = ['sad', 'depressed', 'anxious', 'stressed', 'worried', 'tired', 'overwhelmed', 'difficult', 'hard', 'struggle', 'pain', 'hurt', 'alone', 'isolated'];
     const positiveWords = ['happy', 'good', 'great', 'excellent', 'excited', 'motivated', 'confident', 'grateful', 'better', 'wonderful'];
-    
+
     let score = 0;
-    negativeWords.forEach(word => {
+    negativeWords.forEach((word) => {
       if (lowerText.includes(word)) score -= 1;
     });
-    positiveWords.forEach(word => {
+    positiveWords.forEach((word) => {
       if (lowerText.includes(word)) score += 1;
     });
 
@@ -62,75 +120,69 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
     return 'neutral';
   };
 
-  const getAIResponse = (userMessage: string, detectedSentiment: 'positive' | 'neutral' | 'negative'): string => {
-    if (detectedSentiment === 'negative') {
-      const responses = [
-        "I hear that you're going through a difficult time. It's completely okay to feel this way. Would you like to talk more about what's been bothering you?",
-        "Thank you for sharing that with me. It takes courage to express these feelings. Remember, you're not alone, and it's okay to ask for help.",
-        "I can sense that things have been challenging for you. Your wellbeing matters. Would it help to discuss what's been weighing on your mind?",
-        "I'm here to listen. Sometimes just expressing our feelings can help. What's been the most difficult part for you?",
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    } else if (detectedSentiment === 'positive') {
-      const responses = [
-        "That's wonderful to hear! I'm glad things are going well. Keep up the positive momentum!",
-        "It's great to see you in good spirits! What's been contributing to your positive outlook?",
-        "I'm happy to hear that! Remember to celebrate these moments.",
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    } else {
-      const responses = [
-        "Thank you for checking in. How can I support you today?",
-        "I'm here to listen. Feel free to share whatever is on your mind.",
-        "How has your week been going? I'm here if you need someone to talk to.",
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-  };
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-
-    // Add user message
-    const userMessage: Message = {
-      id: messages.length + 1,
-      sender: 'user',
-      content: input,
-      timestamp: new Date(),
-      isAnonymous: isAnonymousMode,
-    };
-
-    setMessages([...messages, userMessage]);
-
-    // Analyze sentiment
-    const detectedSentiment = analyzeSentiment(input);
-    setSentiment(detectedSentiment);
-
-    // Check if anonymous mode should be triggered
-    if (detectedSentiment === 'negative' && !isAnonymousMode) {
-      setTimeout(() => {
-        const anonymousAlert: Message = {
-          id: messages.length + 2,
-          sender: 'ai',
-          content: "I've noticed you might be going through a tough time. Would you like to enable anonymous mode? Your identity will be completely hidden, and you can speak freely.",
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, anonymousAlert]);
-      }, 1000);
-    }
-
-    // Generate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: messages.length + (detectedSentiment === 'negative' && !isAnonymousMode ? 3 : 2),
-        sender: 'ai',
-        content: getAIResponse(input, detectedSentiment),
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    }, detectedSentiment === 'negative' && !isAnonymousMode ? 2000 : 1000);
+  const handleSend = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || isSending) return;
 
     setInput('');
+    setError(null);
+    setIsSending(true);
+
+    const nextSentiment = analyzeSentiment(trimmed);
+    setSentiment(nextSentiment);
+
+    const timestamp = new Date();
+    const userMessage: Message = {
+      id: `user-${timestamp.getTime()}`,
+      sender: 'user',
+      content: trimmed,
+      timestamp,
+      isAnonymous: isAnonymousMode,
+      anonSessionId: isAnonymousMode ? anonSessionId : null,
+    };
+
+    const aiMessageId = `ai-${timestamp.getTime()}`;
+    const placeholderMessage: Message = {
+      id: aiMessageId,
+      sender: 'ai',
+      content: '',
+      timestamp,
+      isAnonymous: isAnonymousMode,
+      anonSessionId: isAnonymousMode ? anonSessionId : null,
+    };
+
+    setMessages((prev) => [...prev, userMessage, placeholderMessage]);
+
+    const updateMessage = (id: string, updater: (message: Message) => Message) => {
+      setMessages((prev) => prev.map((message) => (message.id === id ? updater(message) : message)));
+    };
+
+    try {
+      const response = await sendWellbeingMessage(
+        employeeId,
+        trimmed,
+        {
+          isAnonymous: isAnonymousMode,
+          anonSessionId: isAnonymousMode ? anonSessionId : null,
+        },
+      );
+      const finalMessage = mapToClientMessage(response);
+      updateMessage(aiMessageId, () => finalMessage);
+      if (isAnonymousMode && finalMessage.anonSessionId) {
+        setAnonSessionId(finalMessage.anonSessionId);
+      }
+      if (finalMessage.content === 'Message failed to send, please try again.') {
+        setError('Message failed to send, please try again.');
+      }
+    } catch (sendError) {
+      updateMessage(aiMessageId, (message) => ({
+        ...message,
+        content: 'Message failed to send, please try again.',
+      }));
+      setError('Message failed to send, please try again.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const getSentimentIcon = () => {
@@ -157,7 +209,6 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      {/* Header Card */}
       <Card className="border border-[#D0E8F5]">
         <CardHeader className="border-b border-[#E8F3F9]">
           <div className="flex items-center justify-between">
@@ -178,18 +229,17 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
         </CardHeader>
       </Card>
 
-      {/* Anonymous Mode Alert */}
       {isAnonymousMode && (
         <Alert className="border-[#4167B1]/20 bg-[#DEF0F9]">
           <Shield className="w-4 h-4 text-[#4167B1]" />
           <AlertDescription>
             <div className="flex items-center justify-between">
               <span>
-                <strong>Anonymous Mode Active:</strong> Your identity is completely hidden. 
+                <strong>Anonymous Mode Active:</strong> Your identity is completely hidden.
                 Feel free to speak openly.
               </span>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => setIsAnonymousMode(false)}
               >
@@ -208,7 +258,7 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
               <span>
                 Need to speak freely? Enable anonymous mode for complete privacy.
               </span>
-              <Button 
+              <Button
                 size="sm"
                 onClick={() => setIsAnonymousMode(true)}
               >
@@ -219,56 +269,67 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
         </Alert>
       )}
 
-      {/* Chat Area */}
+      {error && (
+        <Alert className="border-destructive/20 bg-red-50">
+          <AlertCircle className="w-4 h-4 text-destructive" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <Card className="h-[500px] flex flex-col border border-[#D0E8F5]">
         <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
+          {isLoadingHistory && (
+            <div className="text-sm text-muted-foreground">Loading your conversation...</div>
+          )}
+          {!isLoadingHistory &&
+            messages.map((message) => (
               <div
-                className={`max-w-[70%] rounded-lg p-4 ${
-                  message.sender === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-foreground'
-                }`}
+                key={`${message.id}-${message.timestamp.getTime()}`}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {message.isAnonymous && (
-                  <Badge variant="secondary" className="mb-2">
-                    <Shield className="w-3 h-3 mr-1" />
-                    Anonymous
-                  </Badge>
-                )}
-                <p className="whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-2 ${
-                  message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                }`}>
-                  {message.timestamp.toLocaleTimeString()}
-                </p>
+                <div
+                  className={`max-w-[70%] rounded-lg p-4 ${
+                    message.sender === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-foreground'
+                  }`}
+                >
+                  {message.isAnonymous && (
+                    <Badge variant="secondary" className="mb-2">
+                      <Shield className="w-3 h-3 mr-1" />
+                      Anonymous
+                    </Badge>
+                  )}
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <p
+                    className={`text-xs mt-2 ${
+                      message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {message.timestamp.toLocaleTimeString()}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           <div ref={messagesEndRef} />
         </CardContent>
 
-        {/* Input Area */}
         <div className="border-t p-4">
           <div className="flex gap-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
                   handleSend();
                 }
               }}
-              placeholder={isAnonymousMode ? "Speak freely... (Anonymous)" : "Share how you're feeling..."}
+              placeholder={isAnonymousMode ? 'Speak freely... (Anonymous)' : "Share how you're feeling..."}
               className="min-h-[80px] resize-none"
             />
-            <Button onClick={handleSend} className="self-end">
-              <Send className="w-4 h-4" />
+            <Button onClick={handleSend} className="self-end" disabled={isSending}>
+              {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -277,7 +338,6 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
         </div>
       </Card>
 
-      {/* Support Resources */}
       <Card className="border border-[#D0E8F5]">
         <CardHeader className="border-b border-[#E8F3F9]">
           <CardTitle className="text-base">Additional Support Resources</CardTitle>
@@ -300,3 +360,12 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
     </div>
   );
 }
+
+const mapToClientMessage = (message: WellbeingMessage): Message => ({
+  id: `${message.sender}-${message.timestamp}`,
+  sender: message.sender,
+  content: message.content,
+  timestamp: new Date(message.timestamp),
+  isAnonymous: message.isAnonymous,
+  anonSessionId: message.anonSessionId,
+});

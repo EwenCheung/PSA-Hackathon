@@ -35,15 +35,16 @@ def get_connection(url: str | None = None) -> sqlite3.Connection:
     
     # Handle in-memory database for testing
     if db_url == ":memory:":
-        conn = sqlite3.connect(db_url)
+        conn = sqlite3.connect(db_url, check_same_thread=False)
     else:
         # Create data/database/ directory if it doesn't exist
         db_path = os.path.abspath(db_url)
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, check_same_thread=False)
     
     # Ensure foreign key constraints are enforced
     conn.execute("PRAGMA foreign_keys = ON;")
+    conn.row_factory = sqlite3.Row
     return conn
 
 
