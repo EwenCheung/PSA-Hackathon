@@ -1,0 +1,149 @@
+[
+    {
+        "title": "AWS Certified Solutions Architect – Associate 2025",
+        "domain": "Cloud",
+        "skills": ["Cloud Architecture", "AWS", "Infrastructure Design"],
+        "url": "https://www.udemy.com/course/aws-certified-solutions-architect-associate/",
+        "description": "Prepare for the AWS Solutions Architect – Associate exam with this comprehensive course covering core AWS services and architecture best practices."
+    },
+    {
+        "title": "Azure Fundamentals AZ-900 Exam Prep",
+        "domain": "Cloud",
+        "skills": ["Cloud Computing", "Azure", "Cloud Security"],
+        "url": "https://www.udemy.com/course/azure-fundamentals-az-900-exam-prep/",
+        "description": "Gain foundational knowledge of Azure services and prepare for the AZ-900 certification exam."
+    },
+    {
+        "title": "Google Cloud Platform Fundamentals: Core Infrastructure",
+        "domain": "Cloud",
+        "skills": ["Cloud Infrastructure", "GCP", "Cloud Networking"],
+        "url": "https://www.coursera.org/learn/google-cloud-fundamentals-core-infrastructure",
+        "description": "Learn about Google Cloud Platform's core infrastructure services and how they can be used to build scalable applications."
+    },
+    {
+        "title": "Python for Data Science and Machine Learning Bootcamp",
+        "domain": "Data & AI",
+        "skills": ["Python", "Data Analysis", "Machine Learning"],
+        "url": "https://www.udemy.com/course/python-for-data-science-and-machine-learning-bootcamp/",
+        "description": "Master Python for data science and machine learning with this hands-on course covering libraries like Pandas, NumPy, and Scikit-Learn."
+    },
+    {
+        "title": "Data Science and Machine Learning Bootcamp with R",
+        "domain": "Data & AI",
+        "skills": ["R Programming", "Data Science", "Machine Learning"],
+        "url": "https://www.udemy.com/course/data-science-and-machine-learning-bootcamp-with-r/",
+        "description": "Learn data science and machine learning techniques using R, including data visualization and predictive modeling."
+    },
+    {
+        "title": "Deep Learning Specialization",
+        "domain": "Data & AI",
+        "skills": ["Deep Learning", "Neural Networks", "TensorFlow"],
+        "url": "https://www.coursera.org/specializations/deep-learning",
+        "description": "Explore deep learning techniques and build neural networks using TensorFlow in this comprehensive specialization."
+    },
+    {
+        "title": "Data Visualization with Tableau Specialization",
+        "domain": "Data & AI",
+        "skills": ["Data Visualization", "Tableau", "Business Intelligence"],
+        "url": "https://www.coursera.org/specializations/data-visualization-tableau",
+        "description": "Learn to create interactive and shareable dashboards using Tableau in this specialization."
+    },
+    {
+        "title": "Introduction to Cyber Security Specialization",
+        "domain": "Cybersecurity",
+        "skills": ["Cybersecurity", "Network Security", "Risk Management"],
+        "url": "https://www.coursera.org/specializations/intro-cyber-security",
+        "description": "Gain foundational knowledge in cybersecurity, including threat analysis and risk management strategies."
+    },
+    {
+        "title": "Certified Ethical Hacker (CEH) v11",
+        "domain": "Cybersecurity",
+        "skills": ["Ethical Hacking", "Penetration Testing", "Network Defense"],
+        "url": "https://www.udemy.com/course/certified-ethical-hacker-ceh-v11/",
+        "description": "Prepare for the CEH v11 certification with this course covering ethical hacking techniques and tools."
+    },
+    {
+        "title": "CompTIA Security+ (SY0-601) Full Course & Exam",
+        "domain": "Cybersecurity",
+        "skills": ["Network Security", "Risk Management", "Compliance"],
+        "url": "https://www.udemy.com/course/comptia-security-sy0-601/",
+        "description": "Comprehensive preparation for the CompTIA Security+ certification exam, covering network security and risk management."
+    },
+    {
+        "title": "AWS Certified Solutions Architect – Professional",
+        "domain": "Cloud",
+        "skills": ["Cloud Architecture", "AWS", "Advanced Networking"],
+        "url": "https://www.udemy.com/course/aws-certified-solutions-architect-professional/",
+        "description": "Advanced course for the AWS Certified Solutions Architect – Professional exam, focusing on complex AWS architectures."
+    },
+    {
+        "title": "Microsoft Certified: Azure Solutions Architect Expert",
+        "domain": "Cloud",
+        "skills": ["Azure", "Cloud Solutions", "Architecture Design"],
+        "url": "https://learn.microsoft.com/en-us/certifications/azure-solutions-architect/",
+        "description": "Prepare for the Azure Solutions Architect Expert certification with this official Microsoft training."
+    },
+    {
+        "title": "Google Cloud Professional Cloud Architect",
+        "domain": "Cloud",
+        "skills": ["GCP", "Cloud Architecture", "Infrastructure Management"],
+        "url": "https://cloud.google.com/certification/cloud-architect",
+        "description": "Official Google Cloud training for the Professional Cloud Architect certification."
+    },
+    {
+        "title": "Python for Data Science and Machine Learning",
+        "domain": "Data & AI",
+        "skills": ["Python", "Data Science", "Machine Learning"],
+        "url": "https://www.udemy.com/course/python-for-data-science-and-machine-learning/",
+        "description": "Learn Python programming and apply it to data science and machine learning tasks."
+    },
+    {
+        "title": "Machine Learning A-Z™: Hands-On Python & R In Data Science",
+        "domain": "Data & AI",
+        "skills": ["Machine Learning", "Python", "R Programming"],
+        "url": "https://www.udemy.com/course/machinelearning/",
+        "description": "Comprehensive course covering machine learning algorithms and their implementation in Python and R."
+    },
+    {
+        "title": "Data Science and Machine Learning Bootcamp with R",
+        "domain": "Data & AI",
+        "skills": ["Data Science", "Machine Learning", "R Programming"],
+        "url": "https://www.udemy.com/course/data-science-and-machine-learning-bootcamp-with-r/",
+        "description": "Learn data science and machine learning techniques using R, including data visualization and predictive modeling."
+    },
+    {
+        "title": "Deep Learning Specialization",
+        "domain": "Data & AI",
+        "skills": ["Deep Learning", "Neural Networks", "TensorFlow"],
+        "url": "https://www.coursera.org/specializations/deep-learning",
+        "description": "Explore deep learning techniques and build neural networks using TensorFlow in this comprehensive specialization."
+    },
+    {
+        "title": "Data Visualization with Tableau Specialization",
+        "domain": "Data & AI",
+        "skills": ["Data Visualization", "Tableau", "Business Intelligence"],
+        "url": "https://www.coursera.org/specializations/data-visualization-tableau",
+        "description": "Learn to create interactive and shareable dashboards using Tableau in this specialization."
+    },
+    {
+        "title": "Introduction to Cyber Security Specialization",
+        "domain": "Cybersecurity",
+        "skills": ["Cybersecurity", "Network Security", "Risk Management"],
+        "url": "https://www.coursera.org/specializations/intro-cyber-security",
+        "description": "Gain foundational knowledge in cybersecurity, including threat analysis and risk management strategies."
+    },
+    {
+        "title": "Certified Ethical Hacker (CEH) v11",
+        "domain": "Cybersecurity",
+        "skills": ["Ethical Hacking", "Penetration Testing", "Network Defense"],
+        "url": "https://www.udemy.com/course/certified-ethical-hacker-ceh-v11/",
+        "description": "Prepare for the CEH v11 certification with this course covering ethical hacking techniques and tools."
+    },
+    {
+        "title": "CompTIA Security+ (SY0-601) Full Course & Exam",
+        "domain": "Cybersecurity",
+        "skills": ["Network Security", "Risk Management", "Compliance"],
+        "url": "https://www.udemy.com/course/comptia-security-sy0-601/",
+        "description": "Comprehensive preparation for the CompTIA Security+ certification exam, covering network security and risk management."
+    }
+]
