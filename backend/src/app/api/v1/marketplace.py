@@ -1,38 +1,59 @@
 """
-API: Marketplace
+API v1: Marketplace Router
 
 Purpose
 - Serve items catalog and support redemption with points.
 
-Routes (contracts only; implemented later via FastAPI):
+Routes:
 - GET /api/v1/marketplace/items
 - POST /api/v1/marketplace/redeem
 """
 
+from fastapi import APIRouter, HTTPException, status
 from typing import List
-from app.models.pydantic_schemas import MarketplaceItemDetail
+
+from app.models.pydantic_schemas import MarketplaceItemDetail, RedemptionRequest
+
+# Create router
+router = APIRouter(
+    prefix="/api/v1/marketplace",
+    tags=["Marketplace"],
+)
 
 
-EXPECTED_ROUTES: List[str] = [
-    "/api/v1/marketplace/items",
-    "/api/v1/marketplace/redeem",
-]
-
-
-def list_items() -> List[MarketplaceItemDetail]:
+@router.get("/items", response_model=List[MarketplaceItemDetail])
+async def list_items():
     """
-    Contract: return available rewards items with stock and points.
-    Returns: List[MarketplaceItemDetail]
+    Get available rewards items with stock and points.
+    
+    Returns:
+        List[MarketplaceItemDetail]: Available marketplace items
+        
+    Raises:
+        HTTPException: 501 Not Implemented
     """
-    # Placeholder
-    raise NotImplementedError
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Marketplace listing not yet implemented"
+    )
 
 
-def redeem(employee_id: str, item_id: str) -> MarketplaceItemDetail:
+@router.post("/redeem", response_model=MarketplaceItemDetail)
+async def redeem_item(request: RedemptionRequest):
     """
-    Contract: adjust points and record redemption.
-    Returns: MarketplaceItemDetail
+    Redeem an item with points.
+    
+    Args:
+        request: Redemption request with employee_id and item_id
+        
+    Returns:
+        MarketplaceItemDetail: The redeemed item details
+        
+    Raises:
+        HTTPException: 501 Not Implemented
     """
-    # Placeholder
-    raise NotImplementedError
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Redemption not yet implemented"
+    )
 

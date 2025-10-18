@@ -1,49 +1,73 @@
 """
 Application entrypoint
 
-Hosts the FastAPI application and wires v1 routers as they come online.
+FastAPI application wiring v1 routers:
+- employees, wellbeing, marketplace, sample
+
+The actual route handlers are defined in api/v1/ modules.
+This file just creates the app and includes the routers.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
-from app.api.v1.analytics import router as analytics_router
-from app.core.db import get_connection, init_db
-from app.data.seed_data import load_all_seeds
+from app.api.v1 import employees, wellbeing, marketplace, sample
+from app.core.config import settings
 
 APP_DESCRIPTION = "Future-Ready Workforce Agent Platform API"
 
+# Create FastAPI app
 app = FastAPI(
-    title="PSA Hackathon API",
+    title="PSA Future-Ready Workforce Platform",
     description=APP_DESCRIPTION,
     version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-# Allow the Vite dev server and other origins during development.
+# Configure CORS to allow frontend to call backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # In production, replace with specific frontend URL
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Wire up available routes.
-app.include_router(analytics_router)
+# Include routers from api/v1
+app.include_router(employees.router)
+app.include_router(wellbeing.router)
+app.include_router(marketplace.router)
+app.include_router(sample.router)  # Example router showing the pattern
 
 
-@app.on_event("startup")
-def startup() -> None:
-    """
-    Ensure the SQLite schema exists and demo data is loaded for local runs.
-    """
-    conn = get_connection()
-    try:
-        init_db(conn)
-        load_all_seeds(conn)
-    finally:
-        conn.close()
+# Health check endpoints
+@app.get("/")
+async def root():
+    """Health check endpoint"""
+    return {
+        "status": "ok",
+        "message": "PSA Future-Ready Workforce Platform API is running",
+        "version": "0.1.0",
+    }
 
 
-@app.get("/health", tags=["system"])
-def health() -> dict[str, str]:
-    """Health check endpoint for uptime monitoring."""
-    return {"status": "ok"}
+@app.get("/health")
+async def health_check():
+    """Detailed health check"""
+    return {
+        "status": "healthy",
+        "environment": settings.env,
+        "anonymous_mode": settings.enable_anonymous_mode,
+    }
+
+
+def start_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = True):
+    """Start the FastAPI server with uvicorn"""
+    uvicorn.run("app.main:app", host=host, port=port, reload=reload)
+
+
+if __name__ == "__main__":
+    # Run the server when executing this file directly
+    start_server()
+
