@@ -337,3 +337,27 @@ class LeadershipPotentialPredictionCreate(BaseModel):
 
 class LeadershipPotentialPredictionDetail(LeadershipPotentialPredictionBase):
     pass
+
+# --- Analytics ---
+class AnalyticsOverview(BaseModel):
+    total_employees: int
+    total_completed_courses: int
+    average_career_progress: float
+
+
+class AnalyticsDepartment(BaseModel):
+    department_id: str
+    department_name: str
+    employee_count: int
+    average_performance: float
+
+
+class AnalyticsEmployee(BaseModel):
+    id: str
+    name: str
+    role: str
+    department: str
+    courses_completed: int
+    courses_in_progress: int
+    career_progress_percent: float
+    points: int

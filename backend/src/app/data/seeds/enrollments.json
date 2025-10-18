@@ -1,0 +1,82 @@
+[
+  {
+    "employee_id": "EMP001",
+    "course_id": "COURSE001",
+    "status": "completed",
+    "progress_percent": 100,
+    "started_at": "2024-01-10",
+    "completed_at": "2024-03-15",
+    "points_awarded": 100
+  },
+  {
+    "employee_id": "EMP001",
+    "course_id": "COURSE003",
+    "status": "in-progress",
+    "progress_percent": 55,
+    "started_at": "2024-05-01"
+  },
+  {
+    "employee_id": "EMP002",
+    "course_id": "COURSE002",
+    "status": "completed",
+    "progress_percent": 100,
+    "started_at": "2024-02-05",
+    "completed_at": "2024-04-20",
+    "points_awarded": 80
+  },
+  {
+    "employee_id": "EMP002",
+    "course_id": "COURSE004",
+    "status": "in-progress",
+    "progress_percent": 60,
+    "started_at": "2024-06-10"
+  },
+  {
+    "employee_id": "EMP003",
+    "course_id": "COURSE003",
+    "status": "completed",
+    "progress_percent": 100,
+    "started_at": "2024-03-12",
+    "completed_at": "2024-06-01",
+    "points_awarded": 120
+  },
+  {
+    "employee_id": "EMP003",
+    "course_id": "COURSE005",
+    "status": "in-progress",
+    "progress_percent": 35,
+    "started_at": "2024-07-15"
+  },
+  {
+    "employee_id": "EMP004",
+    "course_id": "COURSE004",
+    "status": "completed",
+    "progress_percent": 100,
+    "started_at": "2024-01-05",
+    "completed_at": "2024-02-28",
+    "points_awarded": 90
+  },
+  {
+    "employee_id": "EMP004",
+    "course_id": "COURSE002",
+    "status": "in-progress",
+    "progress_percent": 70,
+    "started_at": "2024-05-18"
+  },
+  {
+    "employee_id": "EMP005",
+    "course_id": "COURSE002",
+    "status": "completed",
+    "progress_percent": 100,
+    "started_at": "2024-04-01",
+    "completed_at": "2024-07-10",
+    "points_awarded": 80
+  },
+  {
+    "employee_id": "EMP005",
+    "course_id": "COURSE001",
+    "status": "in-progress",
+    "progress_percent": 45,
+    "started_at": "2024-08-03"
+  }
+]

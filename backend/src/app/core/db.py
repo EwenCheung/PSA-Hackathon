@@ -44,6 +44,7 @@ def get_connection(url: str | None = None) -> sqlite3.Connection:
     
     # Ensure foreign key constraints are enforced
     conn.execute("PRAGMA foreign_keys = ON;")
+    conn.row_factory = sqlite3.Row
     return conn
 
 

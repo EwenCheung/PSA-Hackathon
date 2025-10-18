@@ -3,15 +3,17 @@ API: Analytics
 
 Purpose
 - Company-wide KPIs and aggregates for employer dashboard.
-
-Routes (contracts only; implemented later via FastAPI):
-- GET /api/v1/analytics/overview
-- GET /api/v1/analytics/departments
-- GET /api/v1/analytics/employees
 """
-
 from typing import List
-from app.models.pydantic_schemas import DepartmentDetail, EmployeeDetail
+
+from fastapi import APIRouter, Depends
+
+from app.models.pydantic_schemas import (
+    AnalyticsDepartment,
+    AnalyticsEmployee,
+    AnalyticsOverview,
+)
+from app.services.analytics_service import AnalyticsService
 
 
 EXPECTED_ROUTES: List[str] = [
@@ -20,30 +22,53 @@ EXPECTED_ROUTES: List[str] = [
     "/api/v1/analytics/employees",
 ]
 
-
-def overview() -> dict:
-    """
-    Contract: return top-level KPIs for dashboard tiles.
-    Returns: dict (placeholder)
-    """
-    # Placeholder
-    raise NotImplementedError
+router = APIRouter(prefix="/api/v1/analytics", tags=["analytics"])
 
 
-def departments() -> List[DepartmentDetail]:
-    """
-    Contract: return department aggregates including sentiment.
-    Returns: List[DepartmentDetail]
-    """
-    # Placeholder
-    raise NotImplementedError
+def get_analytics_service() -> AnalyticsService:
+    return AnalyticsService()
 
 
-def employees() -> List[EmployeeDetail]:
+def overview(service: AnalyticsService | None = None) -> AnalyticsOverview:
     """
-    Contract: return employee rows for detailed cards.
-    Returns: List[EmployeeDetail]
+    Return top-level KPIs for dashboard tiles.
     """
-    # Placeholder
-    raise NotImplementedError
+    service = service or AnalyticsService()
+    return service.get_overview_metrics()
 
+
+def departments(service: AnalyticsService | None = None) -> List[AnalyticsDepartment]:
+    """
+    Return department aggregates with blended performance scores.
+    """
+    service = service or AnalyticsService()
+    return service.get_department_metrics()
+
+
+def employees(service: AnalyticsService | None = None) -> List[AnalyticsEmployee]:
+    """
+    Return employee rows for detailed cards (without sentiment data).
+    """
+    service = service or AnalyticsService()
+    return service.get_employee_metrics()
+
+
+@router.get("/overview", response_model=AnalyticsOverview)
+def overview_endpoint(
+    service: AnalyticsService = Depends(get_analytics_service),
+) -> AnalyticsOverview:
+    return service.get_overview_metrics()
+
+
+@router.get("/departments", response_model=List[AnalyticsDepartment])
+def departments_endpoint(
+    service: AnalyticsService = Depends(get_analytics_service),
+) -> List[AnalyticsDepartment]:
+    return service.get_department_metrics()
+
+
+@router.get("/employees", response_model=List[AnalyticsEmployee])
+def employees_endpoint(
+    service: AnalyticsService = Depends(get_analytics_service),
+) -> List[AnalyticsEmployee]:
+    return service.get_employee_metrics()

@@ -135,6 +135,33 @@ def load_courses(conn: sqlite3.Connection) -> None:
     print(f"✅ Loaded {len(data)} courses")
 
 
+def load_enrollments(conn: sqlite3.Connection) -> None:
+    """Load enrollments seed data."""
+    seeds_dir = get_seeds_dir()
+    data = load_json_file(seeds_dir / "enrollments.json")
+
+    cursor = conn.cursor()
+    for record in data:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO enrollments 
+            (employee_id, course_id, status, progress_percent, started_at, completed_at, points_awarded)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["employee_id"],
+                record["course_id"],
+                record["status"],
+                record["progress_percent"],
+                record.get("started_at"),
+                record.get("completed_at"),
+                record.get("points_awarded"),
+            ),
+        )
+    conn.commit()
+    print(f"✅ Loaded {len(data)} enrollments")
+
+
 def load_course_skills(conn: sqlite3.Connection) -> None:
     """Load course-skill mappings seed data."""
     seeds_dir = get_seeds_dir()
@@ -239,10 +266,11 @@ def load_all_seeds(conn: sqlite3.Connection) -> None:
     2. employees (depends on departments)
     3. skills (no dependencies)
     4. courses (no dependencies)
-    5. course_skills (depends on courses, skills)
-    6. mentorship_profiles (depends on employees)
-    7. marketplace_items (no dependencies)
-    8. goals (depends on employees)
+    5. enrollments (depends on employees, courses)
+    6. course_skills (depends on courses, skills)
+    7. mentorship_profiles (depends on employees)
+    8. marketplace_items (no dependencies)
+    9. goals (depends on employees)
     
     Args:
         conn: SQLite database connection
@@ -256,6 +284,7 @@ def load_all_seeds(conn: sqlite3.Connection) -> None:
         load_employees(conn)
         load_skills(conn)
         load_courses(conn)
+        load_enrollments(conn)
         load_course_skills(conn)
         load_mentorship_profiles(conn)
         load_marketplace_items(conn)
@@ -301,6 +330,7 @@ if __name__ == "__main__":
         "skills": cursor.execute("SELECT COUNT(*) FROM skills").fetchone()[0],
         "courses": cursor.execute("SELECT COUNT(*) FROM courses").fetchone()[0],
         "course_skills": cursor.execute("SELECT COUNT(*) FROM course_skills").fetchone()[0],
+        "enrollments": cursor.execute("SELECT COUNT(*) FROM enrollments").fetchone()[0],
         "mentorship_profiles": cursor.execute("SELECT COUNT(*) FROM mentorship_profiles").fetchone()[0],
         "marketplace_items": cursor.execute("SELECT COUNT(*) FROM marketplace_items").fetchone()[0],
         "goals": cursor.execute("SELECT COUNT(*) FROM goals").fetchone()[0],
