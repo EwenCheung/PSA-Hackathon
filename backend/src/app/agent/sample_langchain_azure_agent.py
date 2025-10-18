@@ -75,4 +75,4 @@ response =agent.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
 )
 
-print("Agent Response:", response.messages.content)
+print("Agent Response:", response)
