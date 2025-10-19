@@ -3,24 +3,29 @@ import sqlite3
 from pathlib import Path
 from .course_skill import CourseSkillRepository
 from .course import CourseRepository
-from .employee import EmployeeRepository  # <-- added
+from .employee import EmployeeRepository  
+from .purchase_history import PurchaseHistoryRepository
 
 def sync_all():
     db_path = Path(__file__).parent.parent / "database" / "app.db"
     conn = sqlite3.connect(db_path)
     
     # Sync courses
-    course_repo = CourseRepository(conn, auto_sync=False)
+    course_repo = CourseRepository(conn)
     course_repo.sync_from_json()
     
     # Sync course_skills
-    course_skill_repo = CourseSkillRepository(conn, auto_sync=False)
+    course_skill_repo = CourseSkillRepository(conn)
     course_skill_repo.sync_from_json()
     
     # Sync employees
-    employee_repo = EmployeeRepository(conn, auto_sync=False)
-    employee_repo.sync_from_json()
+    # employee_repo = EmployeeRepository(conn)
+    # employee_repo.sync_from_json()
     
+    # Sync purchase history
+    purchase_repo = PurchaseHistoryRepository(conn)
+    purchase_repo.sync_from_json()
+
     conn.close()
     print("All data synced successfully!")
 

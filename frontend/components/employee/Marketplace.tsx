@@ -214,3 +214,193 @@ export default function Marketplace({ points, onPointsUpdate }: MarketplaceProps
     </div>
   );
 }
+
+// import { useState, useEffect } from 'react';
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+// import { Button } from '../ui/button';
+// import { Badge } from '../ui/badge';
+// import { 
+//   Gift, Coffee, Book, Ticket, 
+//   Smartphone, Award, ShoppingCart, CheckCircle2 
+// } from 'lucide-react';
+// import { Alert, AlertDescription } from '../ui/alert';
+
+// interface MarketplaceProps {
+//   employeeId: string;
+// }
+
+// interface MarketplaceItem {
+//   id: number;
+//   name: string;
+//   description: string;
+//   points_cost: number;
+//   icon: any;
+//   category: string;
+//   in_stock: number;
+// }
+
+// export default function Marketplace({ employeeId }: MarketplaceProps) {
+//   const [points, setPoints] = useState<number>(0);
+//   const [boughtItems, setBoughtItems] = useState<string[]>([]);
+//   const [recentPurchase, setRecentPurchase] = useState<string | null>(null);
+//   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+//   const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItem[]>([]);
+
+//   // Fetch employee points & bought items
+//   const fetchEmployeeData = async () => {
+//     try {
+//       const resPoints = await fetch(`/api/v1/purchase_history/${employeeId}/points`);
+//       const dataPoints = await resPoints.json();
+//       setPoints(dataPoints.points);
+
+//       const resItems = await fetch(`/api/v1/purchase_history/${employeeId}/bought_items`);
+//       const dataItems = await resItems.json();
+//       setBoughtItems(dataItems.bought_items);
+//     } catch (err) {
+//       console.error("Failed to fetch employee purchase history:", err);
+//     }
+//   };
+
+//   // Fetch marketplace items
+//   const fetchMarketplaceItems = async () => {
+//     try {
+//       const res = await fetch('/api/v1/marketplace/items');
+//       const data = await res.json();
+//       setMarketplaceItems(data);
+//     } catch (err) {
+//       console.error("Failed to fetch marketplace items:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEmployeeData();
+//     fetchMarketplaceItems();
+//   }, []);
+
+//   const categories = ['All', ...Array.from(new Set(marketplaceItems.map(item => item.category)))];
+
+//   const handleRedeem = async (item: MarketplaceItem) => {
+//     if (points < item.points_cost) return;
+
+//     try {
+//       const res = await fetch(`/api/v1/purchase_history/${employeeId}/add_item`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ item_name: item.name, cost: item.points_cost }),
+//       });
+
+//       if (!res.ok) {
+//         const errData = await res.json();
+//         alert(errData.detail || "Failed to redeem item");
+//         return;
+//       }
+
+//       const data = await res.json();
+//       setPoints(data.points_remaining);
+//       setBoughtItems(data.bought_items);
+//       setRecentPurchase(item.name);
+//       setTimeout(() => setRecentPurchase(null), 5000);
+//     } catch (err) {
+//       console.error("Failed to redeem item:", err);
+//     }
+//   };
+
+//   const filteredItems = selectedCategory === 'All' 
+//     ? marketplaceItems 
+//     : marketplaceItems.filter(item => item.category === selectedCategory);
+
+//   return (
+//     <div className="max-w-6xl mx-auto space-y-6">
+//       {/* Header */}
+//       <Card className="border border-[#D0E8F5]">
+//         <CardHeader className="border-b border-[#E8F3F9] flex justify-between items-center">
+//           <div>
+//             <CardTitle className="flex items-center gap-2">
+//               <ShoppingCart className="w-5 h-5 text-[#4167B1]" />
+//               Rewards Marketplace
+//             </CardTitle>
+//             <CardDescription>Redeem your earned points for exciting rewards</CardDescription>
+//           </div>
+//           <div className="text-right">
+//             <p className="text-sm text-gray-600">Available Points</p>
+//             <p className="text-3xl">{points}</p>
+//           </div>
+//         </CardHeader>
+//       </Card>
+
+//       {/* Recent Purchase Alert */}
+//       {recentPurchase && (
+//         <Alert className="border-green-500/20 bg-green-50">
+//           <CheckCircle2 className="w-4 h-4 text-green-600" />
+//           <AlertDescription>
+//             <strong>Success!</strong> You've redeemed {recentPurchase}. Check your email for details.
+//           </AlertDescription>
+//         </Alert>
+//       )}
+
+//       {/* Category Filter */}
+//       <div className="flex gap-2 flex-wrap">
+//         {categories.map(category => (
+//           <Button
+//             key={category}
+//             variant={selectedCategory === category ? 'default' : 'outline'}
+//             size="sm"
+//             onClick={() => setSelectedCategory(category)}
+//           >
+//             {category}
+//           </Button>
+//         ))}
+//       </div>
+
+//       {/* Items Grid */}
+//       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {filteredItems.map(item => {
+//           const Icon = item.icon;
+//           const canAfford = points >= item.points_cost && item.in_stock;
+
+//           return (
+//             <Card key={item.id} className={`border border-[#D0E8F5] ${!canAfford ? 'opacity-60' : ''}`}>
+//               <CardHeader>
+//                 <div className="flex items-start justify-between">
+//                   <div className="w-12 h-12 bg-[#DEF0F9] rounded-lg flex items-center justify-center mb-3">
+//                     <Icon className="w-6 h-6 text-[#4167B1]" />
+//                   </div>
+//                   <Badge variant="secondary">{item.category}</Badge>
+//                 </div>
+//                 <CardTitle className="text-base">{item.name}</CardTitle>
+//                 <CardDescription>{item.description}</CardDescription>
+//               </CardHeader>
+//               <CardContent>
+//                 <div className="space-y-4">
+//                   <div className="flex items-center justify-between">
+//                     <div className="flex items-center gap-2">
+//                       <Award className="w-5 h-5 text-yellow-600" />
+//                       <span className="text-xl">{item.points_cost} pts</span>
+//                     </div>
+//                     {item.in_stock && (
+//                       <Badge variant="outline" className="text-green-600">In Stock</Badge>
+//                     )}
+//                   </div>
+
+//                   <Button
+//                     className="w-full"
+//                     disabled={!canAfford}
+//                     onClick={() => handleRedeem(item)}
+//                   >
+//                     {!canAfford ? `Need ${item.points_cost - points} more pts` : 'Redeem Now'}
+//                   </Button>
+
+//                   {!canAfford && (
+//                     <p className="text-xs text-center text-gray-500">
+//                       Earn more points to redeem this item
+//                     </p>
+//                   )}
+//                 </div>
+//               </CardContent>
+//             </Card>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// }
