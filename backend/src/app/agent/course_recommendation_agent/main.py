@@ -289,6 +289,9 @@ def get_leadership_potential_employee(employee_id: str) -> dict:
     - Skills: {', '.join(skills) or 'None'}
     - Goals: {', '.join(goals) or 'None'}
 
+    Do note that 'senior' employees are more likely to have leadership, and employees that are good at 
+    communication or show that they want to improve in that is more likely to have leadership too
+
     Based on this profile and PSA's leadership framework,
     assess the employee’s leadership potential and return STRICTLY in this JSON format:
 
@@ -398,6 +401,9 @@ Employee Profile:
 - Completed courses: {num_courses_completed}
 - Skills: {', '.join(skills) or 'None'}
 - Goals: {', '.join(goals) or 'None'}
+
+Do note that 'senior' employees are more likely to have leadership, and employees that are good at 
+communication or show that they want to improve in that is more likely to have leadership too
 
 Return STRICTLY in JSON format:
 

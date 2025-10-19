@@ -1,0 +1,595 @@
+{
+  "total_employees": 30,
+  "roles_count": {
+    "Junior Developer": 3,
+    "Software Engineer": 3,
+    "Frontend Developer": 3,
+    "Data Analyst": 2,
+    "Data Scientist": 2,
+    "Business Analyst": 2,
+    "Operations Manager": 2,
+    "Data Engineer": 2,
+    "Senior Software Engineer": 1,
+    "Product Manager": 1,
+    "Operations Analyst": 1,
+    "HR Specialist": 1,
+    "Backend Developer": 1,
+    "DevOps Engineer": 1,
+    "Operations Specialist": 1,
+    "HR Manager": 1,
+    "UX Designer": 1,
+    "HR Business Partner": 1,
+    "Machine Learning Engineer": 1
+  },
+  "department_count": {
+    "DEPT001": 19,
+    "DEPT002": 4,
+    "DEPT003": 4,
+    "DEPT004": 3
+  },
+  "level_count": {
+    "Mid": 14,
+    "Senior": 8,
+    "Junior": 8
+  },
+  "top_skills": [
+    [
+      "Python Programming",
+      12
+    ],
+    [
+      "Communication",
+      10
+    ],
+    [
+      "SQL & Databases",
+      9
+    ],
+    [
+      "Team Collaboration",
+      8
+    ],
+    [
+      "Data Analysis",
+      8
+    ],
+    [
+      "API Design",
+      7
+    ],
+    [
+      "JavaScript",
+      7
+    ],
+    [
+      "React & Frontend",
+      7
+    ],
+    [
+      "Project Management",
+      5
+    ],
+    [
+      "Leadership",
+      5
+    ],
+    [
+      "Machine Learning",
+      4
+    ],
+    [
+      "Strategic Thinking",
+      3
+    ],
+    [
+      "Cloud Computing (AWS/Azure)",
+      3
+    ],
+    [
+      "DevOps & CI/CD",
+      2
+    ],
+    [
+      "Problem Solving",
+      1
+    ]
+  ],
+  "top_goals": [
+    [
+      "Learn backend",
+      3
+    ],
+    [
+      "Learn ML",
+      2
+    ],
+    [
+      "Optimize logistics",
+      2
+    ],
+    [
+      "Master ML",
+      2
+    ],
+    [
+      "Get certification",
+      2
+    ],
+    [
+      "Implement AI tools",
+      2
+    ],
+    [
+      "Enhance employee engagement",
+      2
+    ],
+    [
+      "Learn advanced React",
+      2
+    ],
+    [
+      "Master SQL",
+      2
+    ],
+    [
+      "Become Tech Lead",
+      1
+    ],
+    [
+      "Improve team efficiency",
+      1
+    ],
+    [
+      "Build portfolio",
+      1
+    ],
+    [
+      "Improve coding skills",
+      1
+    ],
+    [
+      "Contribute to open source",
+      1
+    ],
+    [
+      "Publish research paper",
+      1
+    ],
+    [
+      "Lead data projects",
+      1
+    ],
+    [
+      "Build personal portfolio",
+      1
+    ],
+    [
+      "Improve analytical skills",
+      1
+    ],
+    [
+      "Lead team workshops",
+      1
+    ],
+    [
+      "Automate pipelines",
+      1
+    ],
+    [
+      "Certify in cloud",
+      1
+    ],
+    [
+      "Redesign key products",
+      1
+    ],
+    [
+      "Mentor juniors",
+      1
+    ],
+    [
+      "Build ETL pipelines",
+      1
+    ],
+    [
+      "Optimize database performance",
+      1
+    ],
+    [
+      "Improve employee satisfaction",
+      1
+    ],
+    [
+      "Implement AI in HR",
+      1
+    ],
+    [
+      "Contribute to projects",
+      1
+    ],
+    [
+      "Streamline operations",
+      1
+    ],
+    [
+      "Improve communication",
+      1
+    ]
+  ],
+  "top_enrolled_courses": [
+    [
+      "COURSE002",
+      7
+    ],
+    [
+      "COURSE004",
+      7
+    ],
+    [
+      "COURSE003",
+      5
+    ],
+    [
+      "COURSE005",
+      5
+    ],
+    [
+      "COURSE001",
+      4
+    ],
+    [
+      "COURSE006",
+      2
+    ]
+  ],
+  "top_recommended_courses": [
+    [
+      "Python for Data Science and Machine Learning",
+      13
+    ],
+    [
+      "Cloud Architecture Masterclass",
+      13
+    ],
+    [
+      "Python for Data Science and Machine Learning Bootcamp",
+      11
+    ],
+    [
+      "Cloud DevOps Engineer Nanodegree",
+      11
+    ],
+    [
+      "Cybersecurity Risk Management Framework",
+      8
+    ],
+    [
+      "Machine Learning A-Z™: Hands-On Python & R In Data Science",
+      7
+    ],
+    [
+      "Data Science and Machine Learning Bootcamp with R",
+      6
+    ],
+    [
+      "Data Engineering on Google Cloud",
+      5
+    ],
+    [
+      "AI for Everyone",
+      5
+    ],
+    [
+      "Data Visualization with Tableau Specialization",
+      4
+    ],
+    [
+      "Introduction to Cyber Security Specialization",
+      3
+    ],
+    [
+      "AWS Certified Solutions Architect – Professional",
+      3
+    ],
+    [
+      "Google Cloud Platform Fundamentals: Core Infrastructure",
+      1
+    ]
+  ],
+  "leadership_distribution": {
+    "Mid": 15,
+    "Low": 13,
+    "High": 2
+  },
+  "high_potential_employees": [
+    {
+      "id": "EMP005",
+      "name": "Emma Wilson",
+      "role": "HR Business Partner",
+      "department": "DEPT004",
+      "level": "Senior",
+      "years_with_company": 6.93972602739726,
+      "leadership_score": 7.0,
+      "leadership_category": "High"
+    },
+    {
+      "id": "EMP013",
+      "name": "Mia Davis",
+      "role": "HR Manager",
+      "department": "DEPT004",
+      "level": "Senior",
+      "years_with_company": 8.413698630136986,
+      "leadership_score": 7.0,
+      "leadership_category": "High"
+    }
+  ],
+  "most_senior": [
+    {
+      "id": "EMP022",
+      "name": "Victor Li",
+      "role": "Operations Manager",
+      "department_id": "DEPT002",
+      "level": "Senior",
+      "years_with_company": 9.194520547945206
+    },
+    {
+      "id": "EMP013",
+      "name": "Mia Davis",
+      "role": "HR Manager",
+      "department_id": "DEPT004",
+      "level": "Senior",
+      "years_with_company": 8.413698630136986
+    },
+    {
+      "id": "EMP018",
+      "name": "Rachel Turner",
+      "role": "Product Manager",
+      "department_id": "DEPT003",
+      "level": "Senior",
+      "years_with_company": 7.260273972602739
+    },
+    {
+      "id": "EMP005",
+      "name": "Emma Wilson",
+      "role": "HR Business Partner",
+      "department_id": "DEPT004",
+      "level": "Senior",
+      "years_with_company": 6.93972602739726
+    },
+    {
+      "id": "EMP011",
+      "name": "Karen White",
+      "role": "UX Designer",
+      "department_id": "DEPT003",
+      "level": "Senior",
+      "years_with_company": 6.882191780821918
+    },
+    {
+      "id": "EMP002",
+      "name": "Bob Martinez",
+      "role": "Operations Manager",
+      "department_id": "DEPT002",
+      "level": "Mid",
+      "years_with_company": 6.249315068493151
+    },
+    {
+      "id": "EMP007",
+      "name": "Grace Kim",
+      "role": "Data Scientist",
+      "department_id": "DEPT001",
+      "level": "Senior",
+      "years_with_company": 6.136986301369863
+    },
+    {
+      "id": "EMP030",
+      "name": "Daniel Foster",
+      "role": "Machine Learning Engineer",
+      "department_id": "DEPT001",
+      "level": "Senior",
+      "years_with_company": 5.923287671232877
+    },
+    {
+      "id": "EMP015",
+      "name": "Olivia Scott",
+      "role": "Operations Specialist",
+      "department_id": "DEPT002",
+      "level": "Mid",
+      "years_with_company": 5.772602739726027
+    },
+    {
+      "id": "EMP001",
+      "name": "Alice Chen",
+      "role": "Senior Software Engineer",
+      "department_id": "DEPT001",
+      "level": "Senior",
+      "years_with_company": 5.6
+    }
+  ],
+  "role_analytics": [
+    {
+      "role": "Backend Developer",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 4.0,
+      "avg_years": 4.641095890410959
+    },
+    {
+      "role": "Business Analyst",
+      "count": 2,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 4.0,
+      "avg_years": 3.661643835616438
+    },
+    {
+      "role": "Data Analyst",
+      "count": 2,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 3.5,
+      "avg_years": 3.9493150684931506
+    },
+    {
+      "role": "Data Engineer",
+      "count": 2,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 3.5,
+      "avg_years": 3.7753424657534245
+    },
+    {
+      "role": "Data Scientist",
+      "count": 2,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 4.5,
+      "avg_years": 5.264383561643836
+    },
+    {
+      "role": "DevOps Engineer",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 4.5,
+      "avg_years": 5.16986301369863
+    },
+    {
+      "role": "Frontend Developer",
+      "count": 3,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 3.3333333333333335,
+      "avg_years": 2.7579908675799083
+    },
+    {
+      "role": "HR Business Partner",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 7.0,
+      "avg_years": 6.93972602739726
+    },
+    {
+      "role": "HR Manager",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 7.0,
+      "avg_years": 8.413698630136986
+    },
+    {
+      "role": "HR Specialist",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 6.0,
+      "avg_years": 5.03013698630137
+    },
+    {
+      "role": "Junior Developer",
+      "count": 3,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 3.3333333333333335,
+      "avg_years": 2.346118721461187
+    },
+    {
+      "role": "Machine Learning Engineer",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 5.0,
+      "avg_years": 5.923287671232877
+    },
+    {
+      "role": "Operations Analyst",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 5.0,
+      "avg_years": 4.109589041095891
+    },
+    {
+      "role": "Operations Manager",
+      "count": 2,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 5.5,
+      "avg_years": 7.721917808219178
+    },
+    {
+      "role": "Operations Specialist",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 5.0,
+      "avg_years": 5.772602739726027
+    },
+    {
+      "role": "Product Manager",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 6.5,
+      "avg_years": 7.260273972602739
+    },
+    {
+      "role": "Senior Software Engineer",
+      "count": 1,
+      "avg_skills": 4.0,
+      "avg_leadership_score": 5.0,
+      "avg_years": 5.6
+    },
+    {
+      "role": "Software Engineer",
+      "count": 3,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 3.6666666666666665,
+      "avg_years": 3.643835616438356
+    },
+    {
+      "role": "UX Designer",
+      "count": 1,
+      "avg_skills": 3.0,
+      "avg_leadership_score": 6.0,
+      "avg_years": 6.882191780821918
+    }
+  ],
+  "roles_lacking_skills": [
+    {
+      "role": "Backend Developer",
+      "count": 1,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Product Manager",
+      "count": 1,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Operations Specialist",
+      "count": 1,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Operations Manager",
+      "count": 2,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Operations Analyst",
+      "count": 1,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Machine Learning Engineer",
+      "count": 1,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Junior Developer",
+      "count": 3,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "Software Engineer",
+      "count": 3,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "HR Specialist",
+      "count": 1,
+      "avg_skills": 3.0
+    },
+    {
+      "role": "HR Business Partner",
+      "count": 1,
+      "avg_skills": 3.0
+    }
+  ]
+}

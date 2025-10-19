@@ -1,0 +1,31 @@
+id,name,department_id,role,level,years_with_company,n_skills,n_goals,n_courses_enrolled
+EMP001,Alice Chen,DEPT001,Senior Software Engineer,Senior,5.6,4,2,2
+EMP002,Bob Martinez,DEPT002,Operations Manager,Mid,6.249315068493151,3,2,1
+EMP003,Carol Johnson,DEPT001,Data Analyst,Mid,4.7753424657534245,3,2,1
+EMP004,David Lee,DEPT001,Junior Developer,Junior,2.4712328767123286,3,2,1
+EMP005,Emma Wilson,DEPT004,HR Business Partner,Senior,6.93972602739726,3,2,0
+EMP006,Frank Thompson,DEPT001,Software Engineer,Mid,3.6794520547945204,3,2,1
+EMP007,Grace Kim,DEPT001,Data Scientist,Senior,6.136986301369863,3,2,1
+EMP008,Henry Adams,DEPT001,Frontend Developer,Junior,2.5863013698630137,3,2,1
+EMP009,Isabella Perez,DEPT003,Business Analyst,Mid,4.358904109589041,3,2,1
+EMP010,Jack Lin,DEPT001,DevOps Engineer,Mid,5.16986301369863,3,2,1
+EMP011,Karen White,DEPT003,UX Designer,Senior,6.882191780821918,3,2,1
+EMP012,Leo Brown,DEPT001,Data Engineer,Mid,3.9506849315068493,3,2,1
+EMP013,Mia Davis,DEPT004,HR Manager,Senior,8.413698630136986,3,2,0
+EMP014,Nathan Clark,DEPT001,Junior Developer,Junior,2.347945205479452,3,2,1
+EMP015,Olivia Scott,DEPT002,Operations Specialist,Mid,5.772602739726027,3,2,1
+EMP016,Patrick Evans,DEPT001,Software Engineer,Mid,4.498630136986302,3,2,2
+EMP017,Quinn Foster,DEPT001,Data Analyst,Junior,3.1232876712328768,3,2,1
+EMP018,Rachel Turner,DEPT003,Product Manager,Senior,7.260273972602739,3,2,1
+EMP019,Samuel Green,DEPT001,Backend Developer,Mid,4.641095890410959,3,2,1
+EMP020,Tina Young,DEPT004,HR Specialist,Mid,5.03013698630137,3,2,1
+EMP021,Uma Patel,DEPT001,Software Engineer,Junior,2.7534246575342465,3,2,1
+EMP022,Victor Li,DEPT002,Operations Manager,Senior,9.194520547945206,3,2,1
+EMP023,Wendy Zhao,DEPT001,Data Scientist,Mid,4.391780821917808,3,2,1
+EMP024,Xavier Brooks,DEPT001,Frontend Developer,Mid,3.2739726027397262,3,2,1
+EMP025,Yara Khan,DEPT003,Business Analyst,Junior,2.9643835616438357,3,2,1
+EMP026,Zachary Evans,DEPT001,Junior Developer,Junior,2.219178082191781,3,2,1
+EMP027,Abigail Moore,DEPT001,Data Engineer,Mid,3.6,3,2,1
+EMP028,Benjamin Carter,DEPT001,Frontend Developer,Junior,2.4136986301369863,3,2,1
+EMP029,Charlotte Nguyen,DEPT002,Operations Analyst,Mid,4.109589041095891,3,2,1
+EMP030,Daniel Foster,DEPT001,Machine Learning Engineer,Senior,5.923287671232877,3,2,1
