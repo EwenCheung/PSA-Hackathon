@@ -5,6 +5,7 @@ import sqlite3
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import List, Dict
+import json
 
 # LangChain imports
 from langchain_community.vectorstores import FAISS
@@ -62,7 +63,8 @@ def get_employee_context(employee_id: str) -> dict:
         skill = skill_repo.get_skill(skill_id)
         if skill:
             skill_names.append(skill["name"])
-
+    courses_enrolled = json.loads(employee.get("courses_enrolled_map", "{}"))
+    goals = json.loads(employee.get("goals_set", "[]"))
     return {
         "profile": {
             "id": employee.get("id"),
@@ -199,3 +201,5 @@ def recommend_courses_tool(employee_skills: List[str], top_k: int = 3) -> List[D
 #             print(f"Skills: {', '.join(rec['skills'])}")
 #             print(f"Reason: {rec['reason']}")
 
+if __name__ == "__main__":
+    print(get_employee_context("EMP003"))

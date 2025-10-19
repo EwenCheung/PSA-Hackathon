@@ -4,8 +4,10 @@ import json
 from dotenv import load_dotenv
 from langchain_openai import AzureChatOpenAI
 from langchain.agents import create_agent
-from system_prompt import SYSTEM_PROMPT
-from tools import get_employee_context, recommend_courses_tool
+from .system_prompt import SYSTEM_PROMPT
+from .tools import get_employee_context, recommend_courses_tool
+# from system_prompt import SYSTEM_PROMPT
+# from tools import get_employee_context, recommend_courses_tool
 import re
 from datetime import datetime
 
@@ -460,15 +462,15 @@ JSON data:
 # ------------------------------
 # Entry Point (Leadership Potential (Employee) Test Case)
 # ------------------------------
-if __name__ == "__main__":
-    employee_id = "EMP005"  
-    result = get_leadership_potential_employer(employee_id)
+# if __name__ == "__main__":
+#     employee_id = "EMP005"  
+#     result = get_leadership_potential_employer(employee_id)
 
-    print("\n=== Leadership Potential (Structured JSON) ===")
-    print(json.dumps(result.get("json", {}), indent=2))
+#     print("\n=== Leadership Potential (Structured JSON) ===")
+#     print(json.dumps(result.get("json", {}), indent=2))
 
-    print("\n=== Employer Summary (Dashboard View) ===")
-    print(result.get("text_summary", "No summary generated."))
+#     print("\n=== Employer Summary (Dashboard View) ===")
+#     print(result.get("text_summary", "No summary generated."))
 
 # ------------------------------
 # Entry Point (Leadership Potential (Employee) Test Case)
@@ -501,12 +503,12 @@ if __name__ == "__main__":
 # ----------------------
 # Entry Point (Course Recco Test Case)
 # ----------------------
-# if __name__ == "__main__":
-#     employee_id = "EMP004"
-#     result = get_course_recommendations(employee_id)
+if __name__ == "__main__":
+    employee_id = "EMP004"
+    result = get_course_recommendations(employee_id)
 
-#     print("\n=== Final Structured JSON ===")
-#     print(json.dumps(result.get("json", {}), indent=2))
+    print("\n=== Final Structured JSON ===")
+    print(json.dumps(result.get("json", {}), indent=2))
 
-#     print("\n=== Natural Language Summary ===")
-#     print(result.get("text_summary", "No summary generated."))
+    print("\n=== Natural Language Summary ===")
+    print(result.get("text_summary", "No summary generated."))
