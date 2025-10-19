@@ -56,15 +56,33 @@ def get_employee_context(employee_id: str) -> dict:
     if not employee:
         raise ValueError(f"Employee {employee_id} not found")
 
-    # Parse fields (your EmployeeRepository should already normalize JSON)
-    skill_map = employee.get("skills", {})
+    # --- Parse skills safely ---
+    skill_map_raw = employee.get("skills", "{}")
+    try:
+        skill_map = json.loads(skill_map_raw)
+    except (TypeError, json.JSONDecodeError):
+        skill_map = {}
+
     skill_names = []
     for skill_id in skill_map.keys():
         skill = skill_repo.get_skill(skill_id)
         if skill:
             skill_names.append(skill["name"])
-    courses_enrolled = json.loads(employee.get("courses_enrolled_map", "{}"))
-    goals = json.loads(employee.get("goals_set", "[]"))
+
+    # --- Parse courses safely ---
+    courses_enrolled_raw = employee.get("courses_enrolled", "{}")
+    try:
+        courses_enrolled = json.loads(courses_enrolled_raw)
+    except (TypeError, json.JSONDecodeError):
+        courses_enrolled = {}
+
+    # --- Parse goals safely ---
+    goals_raw = employee.get("goals", "[]")
+    try:
+        goals = json.loads(goals_raw)
+    except (TypeError, json.JSONDecodeError):
+        goals = []
+
     return {
         "profile": {
             "id": employee.get("id"),
@@ -76,9 +94,10 @@ def get_employee_context(employee_id: str) -> dict:
             "hire_date": employee.get("hire_date")
         },
         "skills": skill_names,
-        "goals": employee.get("goals", []),
-        "courses_enrolled": employee.get("courses_enrolled", {})
+        "goals": goals,
+        "courses_enrolled": courses_enrolled
     }
+
 
 def build_or_load_vectorstore() -> FAISS:
     # Initialize Azure OpenAI embeddings correctly
@@ -202,4 +221,6 @@ def recommend_courses_tool(employee_skills: List[str], top_k: int = 3) -> List[D
 #             print(f"Reason: {rec['reason']}")
 
 if __name__ == "__main__":
-    print(get_employee_context("EMP003"))
+    employee = employee_repo.get_employee("EMP003")
+    print(employee)
+
