@@ -41,6 +41,8 @@ def get_connection(url: str | None = None) -> sqlite3.Connection:
         db_path = os.path.abspath(db_url)
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path)
+    # Return rows as sqlite3.Row so repositories can convert to dict(row)
+    conn.row_factory = sqlite3.Row
     
     # Ensure foreign key constraints are enforced
     conn.execute("PRAGMA foreign_keys = ON;")

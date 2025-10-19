@@ -17,8 +17,8 @@ from fastapi import APIRouter, HTTPException, status, Query
 from typing import List
 
 from app.models.pydantic_schemas import EmployeeDetail, CourseDetail, GoalDetail
+from app.services.employee_service import EmployeeService
 from app.core.db import get_connection
-from app.data.repositories.employee import EmployeeRepository
 
 # Create router
 router = APIRouter(
@@ -43,22 +43,12 @@ async def get_employee_profile(employee_id: str):
         HTTPException: 500 for internal errors
     """
     try:
-        conn = get_connection()
-        repo = EmployeeRepository(conn)
-        employee = repo.get_employee(employee_id)
-        if not employee:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Employee {employee_id} not found"
-            )
-        return EmployeeDetail(**employee)
-    except HTTPException:
-        raise
+        service = EmployeeService()
+        return service.get_employee_profile(employee_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal error: {str(e)}")
 
 
 @router.get("/{employee_id}/career/recommendations", response_model=List[CourseDetail])
@@ -158,8 +148,14 @@ async def adjust_points(employee_id: str, delta: int = Query(..., description="P
     Raises:
         HTTPException: 501 Not Implemented
     """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Points adjustment not yet implemented"
-    )
+    try:
+        service = EmployeeService()
+        updated = service.adjust_points_transactional(employee_id, delta, source="api_points_adjust")
+        return updated
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal error: {str(e)}")
 
