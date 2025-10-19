@@ -11,7 +11,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from app.api.v1 import auth, employees, wellbeing, marketplace, sample, analytics
+from app.api.v1 import auth, employees, wellbeing, marketplace, sample, analytics, dev
+
 from app.core.config import settings
 
 APP_DESCRIPTION = "Future-Ready Workforce Agent Platform API"
@@ -41,6 +42,7 @@ app.include_router(wellbeing.router)
 app.include_router(marketplace.router)
 app.include_router(sample.router)  # Example router showing the pattern
 app.include_router(analytics.router)
+app.include_router(dev.router)  # Dev helpers: init & seed DB
 
 
 # Health check endpoints

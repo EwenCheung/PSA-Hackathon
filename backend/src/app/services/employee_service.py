@@ -3,6 +3,7 @@ EmployeeService: Business logic for employee domain.
 """
 from app.data.repositories.employee import EmployeeRepository
 from app.data.repositories.goal import GoalRepository
+from app.data.repositories.points_ledger import PointsLedgerRepository
 from app.models.pydantic_schemas import EmployeeDetail, GoalDetail
 from app.core.db import get_connection
 from typing import List
@@ -41,6 +42,37 @@ class EmployeeService:
         if not employee:
             raise ValueError(f"Employee {employee_id} not found")
         return employee.get("points_current", 0)
+
+    def adjust_points_transactional(self, employee_id: str, delta: int, source: str = "manual", reference_id: str | None = None) -> EmployeeDetail:
+        """Atomically adjust employee points and write a ledger entry."""
+        conn = get_connection()
+        try:
+            cur = conn.cursor()
+            # Start transaction
+            cur.execute("BEGIN")
+
+            # Update employee points
+            cur.execute("UPDATE employees SET points_current = points_current + ? WHERE id = ?", (delta, employee_id))
+            if cur.rowcount == 0:
+                raise ValueError(f"Employee {employee_id} not found")
+
+            # Insert ledger row
+            ledger_repo = PointsLedgerRepository(conn)
+            ledger_data = {
+                "employee_id": employee_id,
+                "delta": delta,
+                "source": source,
+                "reference_id": reference_id,
+                "created_at": __import__("datetime").datetime.utcnow().isoformat(),
+            }
+            ledger_repo.create_entry(ledger_data)
+
+            conn.commit()
+            # Return updated profile
+            return self.get_employee_profile(employee_id)
+        except Exception:
+            conn.rollback()
+            raise
 
     def validate_employee_exists(self, employee_id: str) -> bool:
         return self.employee_repo.get_employee(employee_id) is not None
