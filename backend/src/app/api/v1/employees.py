@@ -18,13 +18,8 @@ from fastapi import APIRouter, HTTPException, status, Query
 from typing import List
 
 from app.models.pydantic_schemas import EmployeeDetail, CourseDetail, GoalDetail
-<<<<<<< HEAD
 from ...agent.course_recommendation_agent.main import get_course_recommendations, get_leadership_potential_employee, get_career_pathway, get_leadership_potential_employer
 from ...agent.course_recommendation_agent.tools import get_employee_context
-=======
-from app.services.employee_service import EmployeeService
-from app.core.db import get_connection
->>>>>>> origin/WenyiBranch
 
 # --------------------------
 # Router
@@ -43,7 +38,6 @@ async def get_employee_profile(employee_id: str):
     Get the full employee profile including skills, goals, and courses.
     """
     try:
-<<<<<<< HEAD
         emp_context = get_employee_context(employee_id)
         if not emp_context or "profile" not in emp_context:
             raise HTTPException(status_code=404, detail=f"Employee {employee_id} not found")
@@ -80,14 +74,6 @@ async def career_recommendations(employee_id: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-=======
-        service = EmployeeService()
-        return service.get_employee_profile(employee_id)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal error: {str(e)}")
->>>>>>> origin/WenyiBranch
 
 
 
@@ -218,7 +204,6 @@ async def adjust_points(employee_id: str, delta: int = Query(..., description="P
     Adjust employee points by delta (add or subtract).
     """
     try:
-<<<<<<< HEAD
         emp_context = get_employee_context(employee_id)
         profile = emp_context.get("profile")
         if not profile:
@@ -231,15 +216,3 @@ async def adjust_points(employee_id: str, delta: int = Query(..., description="P
         raise HTTPException(status_code=404, detail=f"Employee {employee_id} not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-=======
-        service = EmployeeService()
-        updated = service.adjust_points_transactional(employee_id, delta, source="api_points_adjust")
-        return updated
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal error: {str(e)}")
-
->>>>>>> origin/WenyiBranch
