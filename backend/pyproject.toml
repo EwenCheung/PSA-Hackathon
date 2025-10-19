@@ -34,6 +34,10 @@ dependencies = [
     "langchain[anthropic]>=1.0.0",
     "langchain-openai>=1.0.0",
     "langgraph>=0.1.21",
+    "langchain-community>=0.4",
+    "langchain-core>=1.0.0",
+    "sentence-transformers>=5.1.1",
+    "faiss-cpu>=1.12.0",
 ]
 
 [project.optional-dependencies]
