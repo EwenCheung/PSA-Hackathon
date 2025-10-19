@@ -13,6 +13,12 @@ from app.core.db import get_connection, init_db
 from app.data.repositories.employee import EmployeeRepository
 from app.data.seed_data import load_all_seeds
 from .system_prompt import SYSTEM_PROMPT
+from .tools import (
+    update_sentiment_snapshot,
+    get_past_sentiment_history,
+    analyze_message_sentiment,
+    search_wellbeing_resources
+)
 
 load_dotenv()
 _ = settings  # ensure env loaded
@@ -50,7 +56,12 @@ class WellBeingAgent:
 
         self.agent = create_agent(
             model=llm,
-            tools=[],
+            tools=[
+                update_sentiment_snapshot,
+                get_past_sentiment_history,
+                analyze_message_sentiment,
+                search_wellbeing_resources  
+                ],
             system_prompt=SYSTEM_PROMPT,
         )
 
