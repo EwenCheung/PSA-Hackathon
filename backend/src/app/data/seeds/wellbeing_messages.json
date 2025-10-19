@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I've been feeling really stressed at work lately. The deadlines are overwhelming.",
+    "timestamp": "2025-10-15T10:30:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 2,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "I hear you. Work stress is common. Can you tell me more about what's causing the stress?",
+    "timestamp": "2025-10-15T10:30:30Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 3,
+    "employee_id": "EMP002",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm feeling much better today! The new project is exciting and the team is supportive.",
+    "timestamp": "2025-10-18T14:20:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 4,
+    "employee_id": "EMP002",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "That's wonderful to hear! It sounds like you're in a good place right now.",
+    "timestamp": "2025-10-18T14:20:15Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 5,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm worried about my performance review next week. I don't think I've met expectations.",
+    "timestamp": "2025-10-19T09:15:00Z",
+    "is_anonymous": false
+  }
+]
