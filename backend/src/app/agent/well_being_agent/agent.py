@@ -10,7 +10,12 @@ from langchain_openai import AzureChatOpenAI
 
 from app.core.config import settings
 from .system_prompt import SYSTEM_PROMPT
-# from .tools import _
+from .tools import (
+    update_sentiment_snapshot,
+    get_past_sentiment_history,
+    analyze_message_sentiment,
+    search_wellbeing_resources
+)
 
 load_dotenv()
 _ = settings  # ensure env loaded
@@ -40,7 +45,12 @@ class WellBeingAgent:
 
         self.agent = create_agent(
             model=llm,
-            tools=[],
+            tools=[
+                analyze_message_sentiment,
+                update_sentiment_snapshot,
+                get_past_sentiment_history,
+                search_wellbeing_resources
+            ],
             system_prompt=SYSTEM_PROMPT,
         )
 
@@ -93,9 +103,6 @@ class WellBeingAgent:
     def get_messages(self, employee_id: str) -> list[dict[str, Any]]:
         history = self.user_histories.get(employee_id, [])
         return history[-10:]
-
-    def get_message(self, employee_id: str) -> list[dict[str, Any]]:
-        return self.get_messages(employee_id)
 
     def post_message(self, employee_id: str, req) -> dict:
         if self.agent is None:

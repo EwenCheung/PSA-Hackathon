@@ -230,6 +230,62 @@ def load_goals(conn: sqlite3.Connection) -> None:
     print(f"✅ Loaded {len(data)} goals")
 
 
+def load_wellbeing_seeds(conn: sqlite3.Connection) -> None:
+    """Load wellbeing seed data."""
+    seeds_dir = get_seeds_dir()
+    data_messages = load_json_file(seeds_dir / "wellbeing_messages.json")
+    data_snapshots = load_json_file(seeds_dir / "sentiment_snapshot.json")
+    data_sentiments = load_json_file(seeds_dir / "sentiment_messages.json")
+    
+    cursor = conn.cursor()
+    
+    # Load wellbeing messages
+    for record in data_messages:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO wellbeing_messages 
+            (id, employee_id, anon_session_id, sender, content, timestamp, is_anonymous)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["id"], record["employee_id"], record.get("anon_session_id"),
+                record["sender"], record["content"], record["timestamp"], record["is_anonymous"]
+            )
+        )
+        
+    # Load sentiment snapshots
+    for record in data_snapshots:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO sentiment_snapshots
+            (id, employee_id, anon_session_id, day, label, average_score, messages_count, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["id"], record["employee_id"], record.get("anon_session_id"),
+                record["day"], record["label"], record["average_score"], 
+                record["messages_count"], record["created_at"]
+            )
+        )
+    
+    # Load sentiment messages
+    for record in data_sentiments:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO sentiment_messages
+            (id, message_id, label, score, confidence, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["id"], record["message_id"], record["label"],
+                record["score"], record["confidence"], record["created_at"]
+            )
+        )
+    
+    conn.commit()
+    print(f"✅ Loaded wellbeing seed data")
+
+
 def load_all_seeds(conn: sqlite3.Connection) -> None:
     """
     Load all seed data in correct order (respecting foreign keys).
@@ -260,6 +316,7 @@ def load_all_seeds(conn: sqlite3.Connection) -> None:
         load_mentorship_profiles(conn)
         load_marketplace_items(conn)
         load_goals(conn)
+        load_wellbeing_seeds(conn)
         
         print("=" * 50)
         print("✅ All seed data loaded successfully!\n")
