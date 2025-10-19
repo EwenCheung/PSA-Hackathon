@@ -340,17 +340,24 @@ async def complete_course(employee_id: str, course_id: str):
 # --------------------------
 @router.get("/{employee_id}/goals", response_model=List[GoalDetail])
 async def get_employee_goals(employee_id: str):
-    """
-    Return employee's goals.
-    """
     try:
         emp_context = get_employee_context(employee_id)
         goals = emp_context.get("goals", [])
-        return [GoalDetail(**g) if isinstance(g, dict) else g for g in goals]
-    except ValueError:
+
+        print("EMP CONTEXT:", emp_context)
+        print("GOALS PATH:", emp_context.get("profile", {}).get("goals"))
+
+        unpacked_goals = [
+            GoalDetail(name=g) if isinstance(g, str) else GoalDetail(**g)
+            for g in goals
+        ]
+        return unpacked_goals
+    except ValueError as ve:
         raise HTTPException(status_code=404, detail=f"Employee {employee_id} not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
 
 
 # --------------------------
