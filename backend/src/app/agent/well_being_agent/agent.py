@@ -5,12 +5,14 @@ from datetime import datetime, timezone
 from typing import Any, List, Optional
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import AzureChatOpenAI
 
 from app.core.config import settings
+from app.core.db import get_connection, init_db
+from app.data.repositories.employee import EmployeeRepository
+from app.data.seed_data import load_all_seeds
 from .system_prompt import SYSTEM_PROMPT
-# from .tools import _
 
 load_dotenv()
 _ = settings  # ensure env loaded
@@ -22,6 +24,16 @@ class WellBeingAgent:
     def __init__(self) -> None:
         self.agent = None
         self.user_histories: dict[str, list[dict[str, Any]]] = {}
+        self._conn = get_connection()
+        init_db(self._conn)
+        self.employee_repo = EmployeeRepository(self._conn)
+        self._ensure_seed_data()
+
+    def _ensure_seed_data(self) -> None:
+        cursor = self._conn.cursor()
+        count = cursor.execute("SELECT COUNT(*) FROM employees").fetchone()[0]
+        if count == 0:
+            load_all_seeds(self._conn)
 
     def create_wellbeing_agent(self) -> None:
         deployment = os.getenv("DEPLOYMENT")
@@ -34,8 +46,6 @@ class WellBeingAgent:
             max_tokens=256,
         )
 
-        # create_agent signature may vary by langchain version.
-        # Expecting an agent that takes {"messages": List[BaseMessage]}.
         from langchain.agents import create_agent
 
         self.agent = create_agent(
@@ -97,6 +107,35 @@ class WellBeingAgent:
     def get_message(self, employee_id: str) -> list[dict[str, Any]]:
         return self.get_messages(employee_id)
 
+    def _build_employee_context(self, employee_id: str) -> Optional[str]:
+        employee = self.employee_repo.get_employee(employee_id)
+        if not employee:
+            return None
+
+        name = employee.get("name", "Unknown employee")
+        role = employee.get("role", "N/A")
+        position_level = employee.get("position_level", "N/A")
+        department = employee.get("department_id", "N/A")
+        hire_date = employee.get("hire_date", "N/A")
+        courses = employee.get("courses_enrolled", {})
+        goals = employee.get("goals", [])
+        skills = employee.get("skills", {})
+        points = employee.get("points_current", "N/A")
+
+        lines = [
+            "Employee Context:",
+            f"- Name: {name}",
+            f"- Role: {role}",
+            f"- Position Level: {position_level}",
+            f"- Department: {department}",
+            f"- Hire Date: {hire_date}",
+            f"- Current Points: {points}",
+            f"- Courses Enrolled: {', '.join(courses.keys()) if courses else 'N/A'}",
+            f"- Goals: {', '.join(goals) if goals else 'N/A'}",
+            f"- Skills: {', '.join(skills.keys()) if skills else 'N/A'}",
+        ]
+        return "\n".join(lines)
+
     def post_message(self, employee_id: str, req) -> dict:
         if self.agent is None:
             self.create_wellbeing_agent()
@@ -111,8 +150,14 @@ class WellBeingAgent:
         payload_entries = [*existing_history, user_entry]
         payload_messages = self._to_langchain_messages(payload_entries)
 
+        messages: List[BaseMessage] = []
+        context = self._build_employee_context(employee_id)
+        if context:
+            messages.append(SystemMessage(content=context))
+        messages.extend(payload_messages)
+
         result = self.agent.invoke(
-            {"messages": payload_messages, "user_id": employee_id},
+            {"messages": messages, "user_id": employee_id},
             {"configurable": {"thread_id": employee_id}},
         )
 

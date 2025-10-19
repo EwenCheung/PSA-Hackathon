@@ -74,10 +74,19 @@ backend/
 - AI agent modules (e.g., `course_recommendation_agent/`, `well_being_agent/`)
 - `sample_azure_openai_usage.py`: Example of raw Azure OpenAI API usage
 - `sample_langchain_azure_agent.py`: Example of LangChain agent with Azure OpenAI
+- `mentoring_agent/`: Calculates mentor/mentee compatibility scores and explanations
 
 ### `tests/`
 - Test scaffolding for repositories, services, and API (pytest)
 - TDD-first: always write tests before implementation
 
+## Mentoring Agent & Match Requests
+
+- Ensure Azure OpenAI environment variables (`AZURE_OPENAI_*`) are configured; the mentoring agent falls back to heuristic scoring if the LLM is unavailable.
+- New endpoints:
+  - `POST /api/v1/auth/employee-login` – validate employee ID and return session profile.
+  - `GET|POST|DELETE /api/v1/matching/request/{mentee_id}` – manage single active mentor applications per mentee.
+  - `GET /api/v1/matching/mentors` and `/mentees` – browse employees sourced from SQLite.
+- SQLite now stores `position_level` per employee; run the included migration (automatic via `init_db`) or reload seeds to backfill data.
 Frontend -> API -> services -> repositories -> database
 ---

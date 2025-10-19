@@ -5,9 +5,12 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { BookOpen, TrendingUp, Crown, ExternalLink, Target, Lightbulb } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { API_BASE } from '../../src/services/apiClient';
+import type { EmployeeProfile } from '../../src/types/employee';
 
 interface CareerPathProps {
   employeeId: string;
+  profile: EmployeeProfile;
 }
 
 interface Course {
@@ -37,8 +40,8 @@ interface LeadershipEvaluation {
   recommendations: string[];
 }
 
-export default function CareerPath({ employeeId }: CareerPathProps) {
-  const [employeeData, setEmployeeData] = useState<any>({});
+export default function CareerPath({ employeeId, profile }: CareerPathProps) {
+  const [employeeData, setEmployeeData] = useState<any>(profile);
   const [courses, setCourses] = useState<Course[]>([]);
   const [coursesAnalysis, setCoursesAnalysis] = useState<string>("");
   const [careerPathway, setCareerPathway] = useState<any>(null);
@@ -51,10 +54,14 @@ export default function CareerPath({ employeeId }: CareerPathProps) {
     fetchProfile();
   }, [employeeId]);
 
+  useEffect(() => {
+    setEmployeeData(profile);
+  }, [profile]);
+
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/employees/${employeeId}`);
+      const res = await fetch(`${API_BASE}/api/v1/employees/${employeeId}`);
       const data = await res.json();
       setEmployeeData(data);
     } catch (err) {
@@ -67,7 +74,7 @@ export default function CareerPath({ employeeId }: CareerPathProps) {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/employees/${employeeId}/career/recommendations`);
+      const res = await fetch(`${API_BASE}/api/v1/employees/${employeeId}/career/recommendations`);
       const data = await res.json();
       setCourses(data.recommendations?.recommended_courses || []);
       setCoursesAnalysis(data.recommendations?.analysis || "");
@@ -82,7 +89,7 @@ export default function CareerPath({ employeeId }: CareerPathProps) {
   const fetchCareerPathway = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/employees/${employeeId}/career/pathway`);
+      const res = await fetch(`${API_BASE}/api/v1/employees/${employeeId}/career/pathway`);
       const data = await res.json();
       setCareerPathway(data.career_pathway);
       setActiveTab('pathway');
@@ -96,7 +103,7 @@ export default function CareerPath({ employeeId }: CareerPathProps) {
   const fetchLeadership = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/employees/${employeeId}/leadership/potential`);
+      const res = await fetch(`${API_BASE}/api/v1/employees/${employeeId}/leadership/potential`);
       const data = await res.json();
       setLeadership(data.evaluation);
       setActiveTab('leadership');
@@ -147,7 +154,10 @@ export default function CareerPath({ employeeId }: CareerPathProps) {
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Skills</p>
                 <div className="flex flex-wrap gap-2">
-                  {(employeeData.skills || []).map((skill: string) => (
+                  {(Array.isArray(employeeData.skills)
+                    ? employeeData.skills
+                    : Object.keys(employeeData.skills || {})
+                  ).map((skill: string) => (
                     <Badge key={skill} variant="outline" className="bg-white">{skill}</Badge>
                   ))}
                 </div>
@@ -157,9 +167,10 @@ export default function CareerPath({ employeeId }: CareerPathProps) {
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Career Goals</p>
                 <div className="flex flex-wrap gap-2">
-                  {(employeeData.goals || []).map((goal: string) => (
-                    <Badge key={goal} className="bg-[#4167B1]">{goal}</Badge>
-                  ))}
+                  {(Array.isArray(employeeData.goals) ? employeeData.goals : [])
+                    .map((goal: string) => (
+                      <Badge key={goal} className="bg-[#4167B1]">{goal}</Badge>
+                    ))}
                 </div>
               </div>
               <div>

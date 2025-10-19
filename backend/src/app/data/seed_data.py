@@ -24,6 +24,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from app.data.utils.position_level import derive_position_level
+
 
 def get_seeds_dir() -> Path:
     """Get the seeds directory path."""
@@ -81,12 +83,13 @@ def load_employees(conn: sqlite3.Connection) -> None:
     
     cursor = conn.cursor()
     for record in data:
+        position_level = derive_position_level(record.get("level"), record.get("position_level"))
         cursor.execute(
             """
             INSERT OR REPLACE INTO employees 
-            (id, name, role, department_id, level, points_current, hire_date, 
+            (id, name, role, department_id, level, position_level, points_current, hire_date, 
              skills_map, courses_enrolled_map, goals_set)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 record["id"], 
@@ -94,6 +97,7 @@ def load_employees(conn: sqlite3.Connection) -> None:
                 record["role"], 
                 record["department_id"],
                 record["level"], 
+                position_level,
                 record["points_current"], 
                 record["hire_date"],
                 record["skills_map"], 

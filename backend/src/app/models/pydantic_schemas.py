@@ -29,6 +29,7 @@ class EmployeeBase(BaseModel):
     role: str
     department_id: str
     level: str
+    position_level: Optional[int] = None
     points_current: int
     hire_date: Optional[str]
     skills_map: Optional[str]
@@ -40,6 +41,7 @@ class EmployeeCreate(BaseModel):
     role: str
     department_id: str
     level: str
+    position_level: Optional[int] = None
     points_current: int = 0
     hire_date: Optional[str] = None
     skills_map: Optional[str] = None
@@ -196,6 +198,47 @@ class SentimentSnapshotCreate(BaseModel):
     label: str
     average_score: float
     messages_count: int
+    created_at: str
+
+# --- Auth ---
+class EmployeeLoginRequest(BaseModel):
+    employee_id: str
+
+class EmployeeProfileSummary(BaseModel):
+    id: str
+    name: str
+    role: Optional[str] = None
+    department_id: Optional[str] = None
+    level: Optional[str] = None
+    position_level: Optional[int] = None
+    points_current: int
+    hire_date: Optional[str] = None
+
+
+class EmployeeDirectoryEntry(EmployeeProfileSummary):
+    skills: Optional[Dict[str, Any]] = None
+    goals: Optional[List[str]] = None
+    courses_enrolled: Optional[Dict[str, Any]] = None
+
+class LoginSession(BaseModel):
+    issued_at: str
+
+class EmployeeLoginResponse(BaseModel):
+    employee: EmployeeProfileSummary
+    session: LoginSession
+
+
+class MentorMatchRequestPayload(BaseModel):
+    mentee_id: str
+    mentor_id: str
+
+
+class MentorMatchResponse(BaseModel):
+    mentee_id: str
+    mentor_id: str
+    match_score: float
+    explanation: str
+    status: str
     created_at: str
 
 class SentimentSnapshotDetail(SentimentSnapshotBase):

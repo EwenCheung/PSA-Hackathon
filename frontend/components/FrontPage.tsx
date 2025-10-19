@@ -4,17 +4,32 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Briefcase, Users } from 'lucide-react';
+import { loginEmployee } from '../src/services/auth';
+import type { EmployeeLoginSuccess } from '../src/types/employee';
 
 interface FrontPageProps {
-  onLogin: (type: 'employee' | 'employer', id?: string) => void;
+  onEmployeeAuthenticated: (payload: EmployeeLoginSuccess) => void;
+  onEmployerSelected: () => void;
 }
 
-export default function FrontPage({ onLogin }: FrontPageProps) {
+export default function FrontPage({ onEmployeeAuthenticated, onEmployerSelected }: FrontPageProps) {
   const [employeeId, setEmployeeId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleEmployeeLogin = () => {
-    if (employeeId.trim()) {
-      onLogin('employee', employeeId);
+  const handleEmployeeLogin = async () => {
+    if (!employeeId.trim()) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await loginEmployee(employeeId.trim());
+      onEmployeeAuthenticated(result);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to login with that ID.';
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,16 +63,28 @@ export default function FrontPage({ onLogin }: FrontPageProps) {
                   placeholder="e.g., EMP001"
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleEmployeeLogin()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleEmployeeLogin();
+                    }
+                  }}
                   className="border-2 border-[#4167B1]/30 focus-visible:border-[#4167B1] focus-visible:ring-[#4167B1]/20 h-12 text-base"
+                  disabled={loading}
                 />
               </div>
+              {error && (
+                <p className="text-sm text-red-600" role="alert">
+                  {error}
+                </p>
+              )}
               <Button 
                 className="w-full" 
                 size="lg"
                 onClick={handleEmployeeLogin}
+                disabled={loading}
               >
-                Login as Employee
+                {loading ? 'Validating...' : 'Login as Employee'}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
                 No password required - use your employee ID
@@ -86,7 +113,7 @@ export default function FrontPage({ onLogin }: FrontPageProps) {
               <Button 
                 className="w-full" 
                 size="lg"
-                onClick={() => onLogin('employer')}
+                onClick={onEmployerSelected}
               >
                 Access Employer Dashboard
               </Button>

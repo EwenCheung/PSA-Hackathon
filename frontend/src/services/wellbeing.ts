@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+import { apiClient } from './apiClient';
 
 export interface WellbeingMessage {
   sender: 'user' | 'ai';
@@ -7,8 +7,6 @@ export interface WellbeingMessage {
   isAnonymous: boolean;
   anonSessionId: string | null;
 }
-
-const withBase = (path: string) => `${API_BASE}${path}`;
 
 const deserializeMessage = (payload: any): WellbeingMessage => {
   const rawSender = typeof payload?.sender === 'string' ? payload.sender : 'ai';
@@ -24,11 +22,9 @@ const deserializeMessage = (payload: any): WellbeingMessage => {
 };
 
 export const fetchWellbeingMessages = async (employeeId: string): Promise<WellbeingMessage[]> => {
-  const response = await fetch(withBase(`/api/v1/wellbeing/${employeeId}/messages_past_10_history`));
-  if (!response.ok) {
-    throw new Error('Failed to load wellbeing messages');
-  }
-  const data = await response.json();
+  const data = await apiClient.get<any[]>(
+    `/api/v1/wellbeing/${employeeId}/messages_past_10_history`
+  );
   return Array.isArray(data) ? data.map(deserializeMessage) : [];
 };
 
@@ -42,24 +38,15 @@ export const sendWellbeingMessage = async (
   content: string,
   options: SendOptions,
 ): Promise<WellbeingMessage> => {
-  const response = await fetch(withBase(`/api/v1/wellbeing/${employeeId}/messages`), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+  const payload = await apiClient.post<any>(
+    `/api/v1/wellbeing/${employeeId}/messages`,
+    {
       message: content,
       is_anonymous: options.isAnonymous,
       isAnonymous: options.isAnonymous,
       anon_session_id: options.anonSessionId,
       anonSessionId: options.anonSessionId,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to send wellbeing message');
-  }
-
-  const payload = await response.json();
+    }
+  );
   return deserializeMessage(payload);
 };
