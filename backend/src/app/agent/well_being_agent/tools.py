@@ -3,8 +3,10 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from langchain_core.tools import tool
-from app.core.db import get_connection
+from app.core.db import get_connection, init_db
 from ddgs import DDGS
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
 
 # Lazy load transformers to avoid slow startup
 _tokenizer = None
@@ -15,16 +17,17 @@ def get_sentiment_model():
     global _tokenizer, _model
     
     if _tokenizer is None or _model is None:
-        from transformers import AutoTokenizer, AutoModelForSequenceClassification
-        import torch
         
         # Using DistilBERT for sentiment (fast, accurate, well-supported)
         model_name = "distilbert-base-uncased-finetuned-sst-2-english"
         
         _tokenizer = AutoTokenizer.from_pretrained(model_name)
-        _model = AutoModelForSequenceClassification.from_pretrained(model_name)
-        
-        # Set to eval mode
+        _model = AutoModelForSequenceClassification.from_pretrained(
+            model_name,
+            device_map=None,
+            torch_dtype=torch.float32,
+        )
+        _model.to("cpu")
         _model.eval()
     
     return _tokenizer, _model
@@ -51,58 +54,60 @@ def update_sentiment_snapshot(
     Returns:
         Dict with status confirming the sentiment was recorded
     """
+    print("Updating sentiment snapshot...")
     conn = get_connection()
-    cursor = conn.cursor()
-    
-    current_time = datetime.now(timezone.utc).isoformat()
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    
-    # Record detailed sentiment message
-    if message_id:
+    try:
+        init_db(conn)
+        cursor = conn.cursor()
+
+        current_time = datetime.now(timezone.utc).isoformat()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+        if message_id:
+            cursor.execute(
+                """
+                INSERT INTO sentiment_messages (message_id, label, score, confidence, created_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (message_id, sentiment_label, sentiment_score, abs(sentiment_score), current_time),
+            )
+
         cursor.execute(
             """
-            INSERT INTO sentiment_messages (message_id, label, score, confidence, created_at)
-            VALUES (?, ?, ?, ?, ?)
+            SELECT id, average_score, messages_count
+            FROM sentiment_snapshots
+            WHERE employee_id = ? AND day = ?
             """,
-            (message_id, sentiment_label, sentiment_score, abs(sentiment_score), current_time)
+            (employee_id, today),
         )
-    
-    # Update or create daily snapshot with rolling average
-    cursor.execute(
-        """
-        SELECT id, average_score, messages_count 
-        FROM sentiment_snapshots 
-        WHERE employee_id = ? AND day = ?
-        """,
-        (employee_id, today)
-    )
-    existing = cursor.fetchone()
-    
-    if existing:
-        snapshot_id, avg_score, msg_count = existing
-        new_count = msg_count + 1
-        new_avg = ((avg_score * msg_count) + sentiment_score) / new_count
-        
-        cursor.execute(
-            """
-            UPDATE sentiment_snapshots 
-            SET average_score = ?, messages_count = ?, label = ?, created_at = ?
-            WHERE id = ?
-            """,
-            (new_avg, new_count, sentiment_label, current_time, snapshot_id)
-        )
-    else:
-        cursor.execute(
-            """
-            INSERT INTO sentiment_snapshots 
-            (employee_id, anon_session_id, day, label, average_score, messages_count, created_at)
-            VALUES (?, NULL, ?, ?, ?, 1, ?)
-            """,
-            (employee_id, today, sentiment_label, sentiment_score, current_time)
-        )
-    
-    conn.commit()
-    conn.close()
+        existing = cursor.fetchone()
+
+        if existing:
+            snapshot_id, avg_score, msg_count = existing
+            new_count = msg_count + 1
+            new_avg = ((avg_score * msg_count) + sentiment_score) / new_count
+
+            cursor.execute(
+                """
+                UPDATE sentiment_snapshots
+                SET average_score = ?, messages_count = ?, label = ?, created_at = ?
+                WHERE id = ?
+                """,
+                (new_avg, new_count, sentiment_label, current_time, snapshot_id),
+            )
+        else:
+            cursor.execute(
+                """
+                INSERT INTO sentiment_snapshots
+                (employee_id, anon_session_id, day, label, average_score, messages_count, created_at)
+                VALUES (?, NULL, ?, ?, ?, 1, ?)
+                """,
+                (employee_id, today, sentiment_label, sentiment_score, current_time),
+            )
+
+        conn.commit()
+    finally:
+        conn.close()
     
     return {
         "status": "success",
@@ -131,64 +136,72 @@ def get_past_sentiment_history(
     Returns:
         Dict containing sentiment history with daily snapshots and recent messages
     """
+    print("Retrieving past sentiment history...")
     conn = get_connection()
-    cursor = conn.cursor()
-    
-    # Get daily sentiment snapshots
-    cursor.execute(
-        """
-        SELECT day, label, average_score, messages_count, created_at
-        FROM sentiment_snapshots
-        WHERE employee_id = ?
-        ORDER BY day DESC
-        LIMIT ?
-        """,
-        (employee_id, days_back)
-    )
-    
-    snapshots = []
-    for row in cursor.fetchall():
-        snapshots.append({
-            "day": row[0],
-            "label": row[1],
-            "average_score": row[2],
-            "messages_count": row[3],
-            "created_at": row[4]
-        })
-    
-    # Get recent detailed sentiment messages
-    cursor.execute(
-        """
-        SELECT sm.label, sm.score, sm.confidence, sm.created_at, wm.content
-        FROM sentiment_messages sm
-        JOIN wellbeing_messages wm ON sm.message_id = wm.id
-        WHERE wm.employee_id = ?
-        ORDER BY sm.created_at DESC
-        LIMIT 10
-        """,
-        (employee_id,)
-    )
-    
-    recent_sentiments = []
-    for row in cursor.fetchall():
-        recent_sentiments.append({
-            "label": row[0],
-            "score": row[1],
-            "confidence": row[2],
-            "created_at": row[3],
-            "message_preview": row[4][:100] if row[4] else ""
-        })
-    
-    conn.close()
-    
-    # Calculate summary statistics
+    try:
+        init_db(conn)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT day, label, average_score, messages_count, created_at
+            FROM sentiment_snapshots
+            WHERE employee_id = ?
+            ORDER BY day DESC
+            LIMIT ?
+            """,
+            (employee_id, days_back),
+        )
+
+        snapshots = [
+            {
+                "day": row[0],
+                "label": row[1],
+                "average_score": row[2],
+                "messages_count": row[3],
+                "created_at": row[4],
+            }
+            for row in cursor.fetchall()
+        ]
+
+        cursor.execute(
+            """
+            SELECT sm.label, sm.score, sm.confidence, sm.created_at, wm.content
+            FROM sentiment_messages sm
+            JOIN wellbeing_messages wm ON sm.message_id = wm.id
+            WHERE wm.employee_id = ?
+            ORDER BY sm.created_at DESC
+            LIMIT 10
+            """,
+            (employee_id,),
+        )
+
+        recent_sentiments = [
+            {
+                "label": row[0],
+                "score": row[1],
+                "confidence": row[2],
+                "created_at": row[3],
+                "message_preview": row[4][:100] if row[4] else "",
+            }
+            for row in cursor.fetchall()
+        ]
+    finally:
+        conn.close()
+
     if snapshots:
         avg_overall = sum(s["average_score"] for s in snapshots) / len(snapshots)
-        trend = "improving" if len(snapshots) >= 2 and snapshots[0]["average_score"] > snapshots[-1]["average_score"] else "declining" if len(snapshots) >= 2 else "stable"
+        trend = (
+            "improving"
+            if len(snapshots) >= 2 and snapshots[0]["average_score"] > snapshots[-1]["average_score"]
+            else "declining"
+            if len(snapshots) >= 2
+            else "stable"
+        )
     else:
         avg_overall = 0.0
         trend = "no_data"
-    
+
     return {
         "employee_id": employee_id,
         "days_analyzed": days_back,
@@ -198,8 +211,8 @@ def get_past_sentiment_history(
             "average_sentiment_score": round(avg_overall, 2),
             "trend": trend,
             "total_snapshots": len(snapshots),
-            "data_available": len(snapshots) > 0
-        }
+            "data_available": len(snapshots) > 0,
+        },
     }
 
 @tool
@@ -219,9 +232,7 @@ def analyze_message_sentiment(message_content: str, employee_id: str) -> Dict[st
     Returns:
         Dict with sentiment label, score, confidence, and analysis
     """
-    
-    import torch
-    
+    print("Analyzing message sentiment...")
     tokenizer, model = get_sentiment_model()
     
     # Tokenize input
@@ -324,7 +335,7 @@ def search_wellbeing_resources(
     Returns:
         Dict with search results including titles, URLs, and descriptions
     """
-    
+    print("Searching wellbeing resources...")
     results = []
     query_lower = query.lower()
     
@@ -363,5 +374,3 @@ def search_wellbeing_resources(
         "search_engine": "DuckDuckGo",
         "region": region,
     }
-
-

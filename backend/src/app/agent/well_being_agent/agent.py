@@ -7,6 +7,7 @@ from typing import Any, List, Optional
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import AzureChatOpenAI
+from openai import BadRequestError
 
 from app.core.config import settings
 from app.core.db import get_connection, init_db
@@ -24,16 +25,29 @@ load_dotenv()
 _ = settings  # ensure env loaded
 
 FALLBACK_MESSAGE = "Message failed to send, please try again."
+CONTENT_FILTER_MESSAGES: dict[str, str] = {
+    "self_harm": (
+        "I'm really sorry that you're feeling this way. Your safety matters. "
+        "Please reach out to someone you trust or contact your nearest emergency services. "
+        "If you're in Singapore, you can call the Samaritans of Singapore 24-hour hotline at 1767."
+    ),
+    "generic": (
+        "I'm here to help, but I can't respond to that request. "
+        "Please reach out to a trusted person or professional for support."
+    ),
+}
 
 
 class WellBeingAgent:
-    def __init__(self) -> None:
+    def __init__(self, *, auto_initialize: bool = True) -> None:
         self.agent = None
         self.user_histories: dict[str, list[dict[str, Any]]] = {}
         self._conn = get_connection()
         init_db(self._conn)
         self.employee_repo = EmployeeRepository(self._conn)
         self._ensure_seed_data()
+        if auto_initialize:
+            self.create_wellbeing_agent()
 
     def _ensure_seed_data(self) -> None:
         cursor = self._conn.cursor()
@@ -42,6 +56,8 @@ class WellBeingAgent:
             load_all_seeds(self._conn)
 
     def create_wellbeing_agent(self) -> None:
+        if self.agent is not None:
+            return
         deployment = os.getenv("DEPLOYMENT")
         api_version = os.getenv("API_VERSION")
 
@@ -105,6 +121,61 @@ class WellBeingAgent:
             "anon_session_id": anon_session_id,
         }
 
+    def _extract_content_filter_category(self, error: BadRequestError) -> Optional[str]:
+        payload = getattr(error, "body", None)
+        data: Optional[dict[str, Any]] = payload if isinstance(payload, dict) else None
+        if data is None:
+            response = getattr(error, "response", None)
+            if response is not None:
+                try:
+                    parsed = response.json()
+                except Exception:
+                    parsed = None
+                if isinstance(parsed, dict):
+                    data = parsed
+        if data is None:
+            return None
+        error_block = data.get("error") or {}
+        inner = error_block.get("innererror") or {}
+        filter_result = inner.get("content_filter_result") or {}
+        if not isinstance(filter_result, dict):
+            return None
+        for category, details in filter_result.items():
+            if isinstance(details, dict) and details.get("filtered"):
+                return str(category)
+        return None
+
+    def _make_content_filter_entry(
+        self, user_entry: dict[str, Any], category: str
+    ) -> dict[str, Any]:
+        content = CONTENT_FILTER_MESSAGES.get(category, FALLBACK_MESSAGE)
+        return self._make_entry(
+            sender="ai",
+            content=content,
+            is_anonymous=user_entry.get("is_anonymous", False),
+            anon_session_id=user_entry.get("anon_session_id"),
+        )
+
+    def _detect_sensitive_category(self, content: str) -> Optional[str]:
+        lowered = content.lower()
+        normalized = lowered.replace("-", " ")
+        self_harm_keywords = [
+            "kill myself",
+            "kill me",
+            "hurt myself",
+            "end my life",
+            "suicide",
+            "self harm",
+            "sucide",
+            "want to die",
+            "ending it all",
+            "unalive myself",
+            "unalive me",
+        ]
+        if any(keyword in normalized for keyword in self_harm_keywords):
+            return "self_harm"
+        return None
+
     def _persist_history(self, employee_id: str, entry: dict[str, Any]) -> None:
         history = self.user_histories.setdefault(employee_id, [])
         history.append(entry)
@@ -161,36 +232,49 @@ class WellBeingAgent:
         payload_entries = [*existing_history, user_entry]
         payload_messages = self._to_langchain_messages(payload_entries)
 
+        sensitive_category = self._detect_sensitive_category(req.message)
+        if sensitive_category:
+            assistant_entry = self._make_content_filter_entry(user_entry, sensitive_category)
+            self._persist_history(employee_id, user_entry)
+            self._persist_history(employee_id, assistant_entry)
+            return assistant_entry
+
         messages: List[BaseMessage] = []
         context = self._build_employee_context(employee_id)
         if context:
             messages.append(SystemMessage(content=context))
         messages.extend(payload_messages)
 
-        result = self.agent.invoke(
-            {"messages": messages, "user_id": employee_id},
-            {"configurable": {"thread_id": employee_id}},
-        )
-
-        ai = self._extract_ai(result)
-        if ai is None:
-            content = getattr(result, "content", "") or FALLBACK_MESSAGE
+        assistant_entry: Optional[dict[str, Any]] = None
+        try:
+            result = self.agent.invoke(
+                {"messages": messages, "user_id": employee_id},
+                {"configurable": {"thread_id": employee_id}},
+            )
+        except BadRequestError as error:
+            category = self._extract_content_filter_category(error) or "generic"
+            assistant_entry = self._make_content_filter_entry(user_entry, category)
+        else:
+            ai = self._extract_ai(result)
+            if ai is None:
+                content = getattr(result, "content", "") or FALLBACK_MESSAGE
+            else:
+                content = ai.content
             assistant_entry = self._make_entry(
                 sender="ai",
                 content=content,
                 is_anonymous=user_entry["is_anonymous"],
                 anon_session_id=user_entry["anon_session_id"],
             )
-        else:
-            assistant_entry = self._make_entry(
-                sender="ai",
-                content=ai.content,
-                is_anonymous=user_entry["is_anonymous"],
-                anon_session_id=user_entry["anon_session_id"],
-            )
+        finally:
+            self._persist_history(employee_id, user_entry)
+            if assistant_entry is not None:
+                self._persist_history(employee_id, assistant_entry)
 
-        self._persist_history(employee_id, user_entry)
-        self._persist_history(employee_id, assistant_entry)
+        if assistant_entry is None:
+            fallback_entry = self._make_content_filter_entry(user_entry, "generic")
+            self._persist_history(employee_id, fallback_entry)
+            return fallback_entry
         return assistant_entry
 
 
