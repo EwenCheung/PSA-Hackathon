@@ -6,6 +6,8 @@ from langchain_openai import AzureChatOpenAI
 from langchain.agents import create_agent
 from system_prompt import SYSTEM_PROMPT
 from tools import get_employee_context, recommend_courses_tool
+import re
+from datetime import datetime
 
 # Load environment variables from .env
 load_dotenv()
@@ -46,94 +48,6 @@ def recommend_courses_agent_tool(employee_skills: list) -> str:
 # ----------------------
 # Core Agent Logic
 # ----------------------
-# def get_course_recommendations(employee_id: str) -> dict:
-#     """
-#     Given an employee_id, fetch their context and recommend suitable courses.
-#     """
-#     print(f"=== Fetching Employee {employee_id} Context ===")
-#     emp_context = get_employee_context(employee_id)
-#     profile = emp_context["profile"]
-
-#     # ---- Pretty print employee info ----
-#     print("\n--- Employee Profile ---")
-#     print(f"Name: {profile.get('name')}")
-#     print(f"Role: {profile.get('role')}")
-#     print(f"Department: {profile.get('department_id')}")
-#     print(f"Level: {profile.get('level')}")
-#     print(f"Points: {profile.get('points_current')}")
-#     print(f"Hire Date: {profile.get('hire_date')}")
-
-#     print("\n--- Employee Skills ---")
-#     print(", ".join(emp_context["skills"]) or "No skills found")
-
-#     print("\n--- Employee Goals ---")
-#     print(", ".join(emp_context["goals"]) or "No goals found")
-
-#     print("\n--- Courses Enrolled ---")
-#     print(emp_context["courses_enrolled"] or "None")
-
-#     # ---- Build the LangChain agent ----
-#     agent = create_agent(
-#         model=llm,
-#         tools=[recommend_courses_agent_tool],
-#         system_prompt=SYSTEM_PROMPT
-#     )
-
-#     # ---- Construct dynamic prompt ----
-#     prompt = (
-#         f"Recommend relevant upskilling courses for {profile.get('name')}, "
-#         f"a {profile.get('level')} {profile.get('role')} in department {profile.get('department_id')}. "
-#         f"They currently have skills: {emp_context['skills']}, "
-#         f"and personal or team goals: {emp_context['goals']}. "
-#         f"Provide course suggestions that align with their role, level, and goals."
-#     )
-
-#     print("\n=== Generating Course Recommendations ===")
-
-#     response = agent.invoke({"messages": [{"role": "user", "content": prompt}]})
-
-#     # ---- Extract AI message ----
-#     try:
-#         ai_message = next(
-#             (msg for msg in reversed(response["messages"]) if msg.type == "ai"),
-#             None
-#         )
-#         if not ai_message or not ai_message.content:
-#             raise ValueError("No AI message content found in response")
-
-#         parsed = json.loads(ai_message.content)
-#         return parsed
-
-#     except json.JSONDecodeError:
-#         print("⚠️ Could not parse JSON from LLM output. Returning raw content.")
-#         return {"raw_output": ai_message.content if ai_message else str(response)}
-#     except Exception as e:
-#         print(f"⚠️ Unexpected error while processing response: {e}")
-#         return {"error": str(e), "raw_output": str(response)}
-
-
-# # ----------------------
-# # Entry Point (Test Case)
-# # ----------------------
-# if __name__ == "__main__":
-#     employee_id = "EMP004"  # Change this to test other employees
-#     result = get_course_recommendations(employee_id)
-
-#     # ---- Pretty print structured result ----
-#     print("\n=== Final Recommendations ===")
-#     if "recommended_courses" in result:
-#         print("\nAnalysis:")
-#         print(result["analysis"])
-#         print("\nRecommended Courses:")
-#         for c in result["recommended_courses"]:
-#             print(f"  Course: {c['title']}")
-#             print(f"  Link: {c['url']}")
-#             print(f"  Reason: {c['reason']}")
-#             # print(f"  Matched Skills: {', '.join(c['matched_skills'])}")
-#             print(f"  Expected Outcome: {c['expected_outcome']}\n")
-#     else:
-#         print("Raw result:", result)
-
 def get_course_recommendations(employee_id: str) -> dict:
     """
     Given an employee_id, fetch their context and recommend suitable courses.
@@ -307,18 +221,281 @@ def get_career_pathway(employee_id: str) -> dict:
         print(f"⚠️ Unexpected error while processing response: {e}")
         return {"error": str(e), "raw_output": str(response)}
 
+
+def get_leadership_potential_employee(employee_id: str) -> dict:
+    """
+    Analyze the employee's context and estimate their leadership potential
+    based on PSA's leadership values and employee attributes.
+    Returns both structured JSON and a natural-language explanation.
+    """
+
+    print(f"=== Fetching Employee {employee_id} Context ===")
+    emp_context = get_employee_context(employee_id)
+    profile = emp_context["profile"]
+    skills = emp_context["skills"]
+    goals = emp_context["goals"]
+    courses_enrolled = emp_context["courses_enrolled"]
+
+    # ------------------------------
+    # Compute derived metrics
+    # ------------------------------
+    hire_date_str = profile.get("hire_date")
+    hire_date = datetime.strptime(hire_date_str, "%Y-%m-%d") if hire_date_str else None
+    years_with_company = (
+        (datetime.now() - hire_date).days / 365 if hire_date else 0
+    )
+
+    num_courses_completed = sum(
+        1 for status in courses_enrolled.values() if status.lower() == "completed"
+    )
+
+    # ------------------------------
+    # Build AI reasoning prompt
+    # ------------------------------
+    prompt = f"""
+    You are a talent intelligence assistant for PSA, evaluating leadership potential.
+
+    PSA's Vision:
+    "To be a leading supply chain ecosystem orchestrator powered by innovation, technology and sustainable practices."
+
+    PSA's Mission:
+    "To be the port operator of choice in the world’s gateway hubs, renowned for best-in-class services and successful partnerships."
+
+    PSA's Values:
+    - Committed to Excellence: continuous improvement and innovation
+    - Dedicated to Customers: anticipating and meeting needs
+    - Focused on People: teamwork, respect, and support
+    - Integrated Globally: diversity and local optimization
+    - Responsible Corporate Citizenship: sustainability and ethics
+
+    Leadership Qualities to Evaluate:
+    - Communication, integrity, empathy, accountability
+    - Strategic abilities: vision, problem-solving, delegation
+    - Personal traits: resilience, adaptability, self-awareness
+    - Alignment with PSA values
+    - Growth mindset (shown through upskilling and goals)
+    - Seniority and tenure (longer experience = more maturity)
+    - Learning engagement (courses completed, skill-building)
+
+    Employee Profile:
+    - Name: {profile.get('name')}
+    - Role: {profile.get('role')}
+    - Level: {profile.get('level')}
+    - Department: {profile.get('department_id')}
+    - Years with company: {years_with_company:.1f}
+    - Completed courses: {num_courses_completed}
+    - Skills: {', '.join(skills) or 'None'}
+    - Goals: {', '.join(goals) or 'None'}
+
+    Based on this profile and PSA's leadership framework,
+    assess the employee’s leadership potential and return STRICTLY in this JSON format:
+
+    {{
+        "leadership_analysis": "brief reasoning considering PSA's values and the employee's data",
+        "leadership_score": {{
+            "experience_weight": 0-10,
+            "learning_engagement_weight": 0-10,
+            "soft_skills_alignment_weight": 0-10,
+            "overall_score": 0-10
+        }},
+        "potential_level": "Low | Mid | High",
+        "recommendations": [
+            "specific improvement or action item",
+            "another recommendation"
+        ]
+    }}
+    """
+
+    print("\n=== Predicting Leadership Potential ===")
+    response = llm.invoke(prompt)
+
+    # ------------------------------
+    # Parse and postprocess
+    # ------------------------------
+    try:
+        parsed = json.loads(response.content)
+
+        # --- Generate a motivational summary for UI ---
+        summary_prompt = f"""
+        You are a career coach speaking directly to {profile['name']}.
+        Summarize this leadership evaluation in a positive, constructive way.
+        Encourage them to grow their leadership potential by highlighting their strengths and next steps.
+        Use a professional yet motivating tone.
+
+        JSON:
+        {json.dumps(parsed, indent=2)}
+        """
+
+        summary_response = llm.invoke(summary_prompt)
+        summary_text = summary_response.content.strip() if hasattr(summary_response, "content") else str(summary_response)
+
+        return {"json": parsed, "text_summary": summary_text}
+
+    except json.JSONDecodeError:
+        print("⚠️ Could not parse JSON. Returning raw output.")
+        return {"raw_output": response.content}
+    except Exception as e:
+        print(f"⚠️ Error evaluating leadership potential: {e}")
+        return {"error": str(e), "raw_output": str(response)}
+
+def get_leadership_potential_employer(employee_id: str) -> dict:
+    """
+    Evaluate an employee's leadership potential from an employer's perspective.
+    Focuses on next-generation leadership readiness, alignment with PSA values,
+    and organizational fit. Returns both structured JSON and a concise summary
+    suitable for management dashboards.
+    """
+    print(f"=== Fetching Employee {employee_id} Context ===")
+    emp_context = get_employee_context(employee_id)
+    profile = emp_context["profile"]
+    skills = emp_context["skills"]
+    goals = emp_context["goals"]
+    courses_enrolled = emp_context["courses_enrolled"]
+
+    # ------------------------------
+    # Compute derived metrics
+    # ------------------------------
+    hire_date_str = profile.get("hire_date")
+    hire_date = datetime.strptime(hire_date_str, "%Y-%m-%d") if hire_date_str else None
+    years_with_company = (datetime.now() - hire_date).days / 365 if hire_date else 0
+
+    num_courses_completed = sum(
+        1 for status in courses_enrolled.values() if status.lower() == "completed"
+    )
+
+    # ------------------------------
+    # Build AI reasoning prompt
+    # ------------------------------
+    prompt = f"""
+You are an HR analytics assistant evaluating leadership potential for PSA.
+
+Evaluate the employee’s next-generation leadership potential in alignment
+with PSA’s strategic leadership qualities and values.
+
+PSA Leadership Competencies:
+- Communication & Empathy
+- Strategic Thinking & Systems Vision
+- Accountability & Integrity
+- Innovation & Growth Mindset
+- Team Collaboration & People Development
+- Alignment with PSA’s mission and corporate responsibility
+
+Consider:
+- Role seniority and tenure (experience)
+- Skill depth and relevance to leadership
+- Learning engagement (courses completed, skill-building)
+- Goal alignment with organizational growth
+- Growth mindset and continuous learning
+
+Employee Profile:
+- Name: {profile.get('name')}
+- Role: {profile.get('role')}
+- Level: {profile.get('level')}
+- Department: {profile.get('department_id')}
+- Years with company: {years_with_company:.1f}
+- Completed courses: {num_courses_completed}
+- Skills: {', '.join(skills) or 'None'}
+- Goals: {', '.join(goals) or 'None'}
+
+Return STRICTLY in JSON format:
+
+{{
+    "leadership_summary": "Concise reasoning about leadership readiness and qualities shown",
+    "leadership_factors": {{
+        "experience": "short note and score 0-10",
+        "learning_engagement": "short note and score 0-10",
+        "soft_skills_alignment": "short note and score 0-10",
+        "strategic_outlook": "short note and score 0-10"
+    }},
+    "overall_potential_score": 0-10,
+    "potential_category": "Low | Mid | High",
+    "recommendations_for_employer": [
+        "development or mentorship recommendation",
+        "rotation, leadership program, or targeted training suggestion"
+    ]
+}}
+"""
+
+    print("\n=== Evaluating Leadership Potential (Employer View) ===")
+    response = llm.invoke(prompt)
+    content = response.content.strip() if hasattr(response, "content") else str(response)
+
+    # ------------------------------
+    # Try to extract JSON safely
+    # ------------------------------
+    json_str_match = re.search(r"\{.*\}", content, re.DOTALL)
+    json_str = json_str_match.group(0) if json_str_match else content
+
+    try:
+        parsed = json.loads(json_str)
+
+        # --- Generate executive summary ---
+        summary_prompt = f"""
+You are summarizing leadership potential for HR executives.
+Write a concise, professional summary (3–5 sentences) highlighting:
+- Leadership readiness level (Low/Mid/High)
+- Key observed strengths
+- Potential areas to develop
+- Recommended employer actions
+Keep tone analytical and suitable for a dashboard.
+
+JSON data:
+{json.dumps(parsed, indent=2)}
+"""
+
+        summary_response = llm.invoke(summary_prompt)
+        summary_text = summary_response.content.strip() if hasattr(summary_response, "content") else str(summary_response)
+
+        return {"json": parsed, "text_summary": summary_text}
+
+    except json.JSONDecodeError:
+        print("⚠️ Could not parse JSON. Returning raw output.")
+        return {"raw_output": content}
+    except Exception as e:
+        print(f"⚠️ Error evaluating leadership potential (employer view): {e}")
+        return {"error": str(e), "raw_output": str(response)}
+
+
+
+# ------------------------------
+# Entry Point (Leadership Potential (Employee) Test Case)
+# ------------------------------
+if __name__ == "__main__":
+    employee_id = "EMP005"  
+    result = get_leadership_potential_employer(employee_id)
+
+    print("\n=== Leadership Potential (Structured JSON) ===")
+    print(json.dumps(result.get("json", {}), indent=2))
+
+    print("\n=== Employer Summary (Dashboard View) ===")
+    print(result.get("text_summary", "No summary generated."))
+
+# ------------------------------
+# Entry Point (Leadership Potential (Employee) Test Case)
+# ------------------------------
+# if __name__ == "__main__":
+#     employee_id = "EMP002"  # Example: Bob Martinez
+#     result = get_leadership_potential_employee(employee_id)
+
+#     print("\n=== Final Structured JSON ===")
+#     print(json.dumps(result.get("json", result.get("raw_output", {})), indent=2))
+
+#     print("\n=== Leadership Summary ===")
+#     print(result.get("text_summary", "No summary generated."))
+
+
 # ----------------------
 # Entry Point (Career Pathway Test Case)
 # ----------------------
-if __name__ == "__main__":
-    employee_id = "EMP004"
-    result = get_career_pathway(employee_id)
+# if __name__ == "__main__":
+#     employee_id = "EMP004"
+#     result = get_career_pathway(employee_id)
 
-    print("\n=== Final Structured JSON ===")
-    print(json.dumps(result.get("json", {}), indent=2))
+#     print("\n=== Final Structured JSON ===")
+#     print(json.dumps(result.get("json", {}), indent=2))
 
-    print("\n=== Natural Language Career Pathway Summary ===")
-    print(result.get("text_summary", "No summary generated."))
+#     print("\n=== Natural Language Career Pathway Summary ===")
+#     print(result.get("text_summary", "No summary generated."))
 
 
 # ----------------------
