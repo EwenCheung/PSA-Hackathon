@@ -24,6 +24,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from app.data.utils.position_level import derive_position_level
+
 
 def get_seeds_dir() -> Path:
     """Get the seeds directory path."""
@@ -81,12 +83,13 @@ def load_employees(conn: sqlite3.Connection) -> None:
     
     cursor = conn.cursor()
     for record in data:
+        position_level = derive_position_level(record.get("level"), record.get("position_level"))
         cursor.execute(
             """
             INSERT OR REPLACE INTO employees 
-            (id, name, role, department_id, level, points_current, hire_date, 
+            (id, name, role, department_id, level, position_level, points_current, hire_date, 
              skills_map, courses_enrolled_map, goals_set)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 record["id"], 
@@ -94,6 +97,7 @@ def load_employees(conn: sqlite3.Connection) -> None:
                 record["role"], 
                 record["department_id"],
                 record["level"], 
+                position_level,
                 record["points_current"], 
                 record["hire_date"],
                 record["skills_map"], 
@@ -230,6 +234,62 @@ def load_goals(conn: sqlite3.Connection) -> None:
     print(f"✅ Loaded {len(data)} goals")
 
 
+def load_wellbeing_seeds(conn: sqlite3.Connection) -> None:
+    """Load wellbeing seed data."""
+    seeds_dir = get_seeds_dir()
+    data_messages = load_json_file(seeds_dir / "wellbeing_messages.json")
+    data_snapshots = load_json_file(seeds_dir / "sentiment_snapshot.json")
+    data_sentiments = load_json_file(seeds_dir / "sentiment_messages.json")
+    
+    cursor = conn.cursor()
+    
+    # Load wellbeing messages
+    for record in data_messages:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO wellbeing_messages 
+            (id, employee_id, anon_session_id, sender, content, timestamp, is_anonymous)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["id"], record["employee_id"], record.get("anon_session_id"),
+                record["sender"], record["content"], record["timestamp"], record["is_anonymous"]
+            )
+        )
+        
+    # Load sentiment snapshots
+    for record in data_snapshots:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO sentiment_snapshots
+            (id, employee_id, anon_session_id, day, label, average_score, messages_count, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["id"], record["employee_id"], record.get("anon_session_id"),
+                record["day"], record["label"], record["average_score"], 
+                record["messages_count"], record["created_at"]
+            )
+        )
+    
+    # Load sentiment messages
+    for record in data_sentiments:
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO sentiment_messages
+            (id, message_id, label, score, confidence, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["id"], record["message_id"], record["label"],
+                record["score"], record["confidence"], record["created_at"]
+            )
+        )
+    
+    conn.commit()
+    print(f"✅ Loaded wellbeing seed data")
+
+
 def load_all_seeds(conn: sqlite3.Connection) -> None:
     """
     Load all seed data in correct order (respecting foreign keys).
@@ -260,6 +320,7 @@ def load_all_seeds(conn: sqlite3.Connection) -> None:
         load_mentorship_profiles(conn)
         load_marketplace_items(conn)
         load_goals(conn)
+        load_wellbeing_seeds(conn)
         
         print("=" * 50)
         print("✅ All seed data loaded successfully!\n")

@@ -20,13 +20,13 @@ class EmployeeRepository(BaseRepository):
         """Convert DB row into a structured dict with parsed fields."""
         if not row:
             return {}
-
         return {
             "id": row.get("id"),
             "name": row.get("name"),
             "role": row.get("role"),
             "department_id": row.get("department_id"),
             "level": row.get("level"),
+            "position_level": row.get("position_level"),
             "points_current": row.get("points_current", 0),
             "hire_date": row.get("hire_date"),
             "skills": self._parse_json_field(row.get("skills_map"), {}),
@@ -71,6 +71,7 @@ class EmployeeRepository(BaseRepository):
             "name": emp["name"],
             "role": emp["role"],
             "level": emp["level"],
+            "position_level": emp.get("position_level"),
             "department_id": emp["department_id"],
             "points_current": emp["points_current"],
             "hire_date": emp["hire_date"],

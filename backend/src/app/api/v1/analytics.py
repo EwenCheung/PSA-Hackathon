@@ -11,6 +11,7 @@ import json
 import pandas as pd
 import numpy as np
 import math
+from pandas.errors import DatabaseError
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 
@@ -21,6 +22,19 @@ router = APIRouter(
 
 # Path to your SQLite database
 DB_PATH = Path(__file__).resolve().parents[2] / "data" / "database" / "app.db"
+ANALYTICS_COLUMNS = [
+    "id",
+    "name",
+    "role",
+    "department_id",
+    "level",
+    "skills",
+    "goals",
+    "courses_enrolled",
+    "courses_recommended_json",
+    "leadership_summary",
+    "years_with_company",
+]
 
 
 # ---------------------------
@@ -28,8 +42,16 @@ DB_PATH = Path(__file__).resolve().parents[2] / "data" / "database" / "app.db"
 # ---------------------------
 def load_employee_data():
     conn = sqlite3.connect(DB_PATH)
-    df = pd.read_sql_query("SELECT * FROM employee_insights", conn)
-    conn.close()
+    try:
+        df = pd.read_sql_query("SELECT * FROM employee_insights", conn)
+    except (sqlite3.OperationalError, DatabaseError):
+        df = pd.DataFrame(columns=ANALYTICS_COLUMNS)
+    finally:
+        conn.close()
+
+    missing_columns = [col for col in ANALYTICS_COLUMNS if col not in df.columns]
+    for column in missing_columns:
+        df[column] = pd.Series(dtype="object")
     return df
 
 

@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from app.api.v1 import employees, wellbeing, marketplace, sample, analytics, purchase_history
+from app.api.v1 import auth, employees, wellbeing, marketplace, sample, analytics
 from app.core.config import settings
 
 APP_DESCRIPTION = "Future-Ready Workforce Agent Platform API"
@@ -35,12 +35,13 @@ app.add_middleware(
 )
 
 # Include routers from api/v1
+app.include_router(auth.router)
 app.include_router(employees.router)
 app.include_router(wellbeing.router)
 app.include_router(marketplace.router)
-app.include_router(sample.router)  
-app.include_router(analytics.router) 
-app.include_router(purchase_history.router)
+app.include_router(sample.router)  # Example router showing the pattern
+app.include_router(analytics.router)
+
 
 # Health check endpoints
 @app.get("/")
@@ -71,4 +72,3 @@ def start_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = True):
 if __name__ == "__main__":
     # Run the server when executing this file directly
     start_server()
-
