@@ -43,5 +43,410 @@
     "content": "I'm worried about my performance review next week. I don't think I've met expectations.",
     "timestamp": "2025-10-19T09:15:00Z",
     "is_anonymous": false
+  },
+  {
+    "id": 6,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Performance reviews can feel intimidating. Let's talk about what you've accomplished. What goals did you set at the start of the review period?",
+    "timestamp": "2025-10-19T09:15:45Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 7,
+    "employee_id": "EMP003",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm having trouble balancing work and personal life. I feel like I'm always working.",
+    "timestamp": "2025-10-16T16:45:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 8,
+    "employee_id": "EMP003",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Work-life balance is crucial for wellbeing. What does a typical day look like for you?",
+    "timestamp": "2025-10-16T16:45:30Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 9,
+    "employee_id": "EMP004",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm feeling disconnected from my team. Everyone seems so busy and we rarely talk.",
+    "timestamp": "2025-10-17T11:20:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 10,
+    "employee_id": "EMP004",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Feeling connected to your team is important. Have you thought about reaching out to schedule some informal check-ins?",
+    "timestamp": "2025-10-17T11:20:25Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 11,
+    "employee_id": "EMP005",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I just completed a major project and feel really accomplished! The client was thrilled with the results.",
+    "timestamp": "2025-10-18T15:30:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 12,
+    "employee_id": "EMP005",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Congratulations! That's a wonderful achievement. How did it feel to receive that positive feedback?",
+    "timestamp": "2025-10-18T15:30:20Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 13,
+    "employee_id": "EMP002",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm considering applying for a leadership position but I'm not sure if I'm ready.",
+    "timestamp": "2025-10-19T13:45:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 14,
+    "employee_id": "EMP002",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Taking on leadership can be both exciting and challenging. What skills do you feel confident about, and what areas would you like to develop?",
+    "timestamp": "2025-10-19T13:45:35Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 15,
+    "employee_id": "EMP006",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I've been having conflicts with a coworker and it's affecting my productivity.",
+    "timestamp": "2025-10-19T10:10:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 16,
+    "employee_id": "EMP006",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Workplace conflicts can be difficult. Would you feel comfortable describing the situation? Sometimes talking through it helps find a path forward.",
+    "timestamp": "2025-10-19T10:10:40Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 17,
+    "employee_id": "EMP003",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm feeling burnt out. I can't remember the last time I felt excited about my work.",
+    "timestamp": "2025-10-20T08:30:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 18,
+    "employee_id": "EMP003",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Burnout is a serious concern. Let's explore what might help you regain that sense of purpose. Have you been able to take any time off recently?",
+    "timestamp": "2025-10-20T08:30:50Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 19,
+    "employee_id": "EMP007",
+    "anon_session_id": "ANON123456",
+    "sender": "user",
+    "content": "I'm dealing with anxiety about job security. I've heard rumors about restructuring.",
+    "timestamp": "2025-10-19T14:00:00Z",
+    "is_anonymous": true
+  },
+  {
+    "id": 20,
+    "employee_id": null,
+    "anon_session_id": "ANON123456",
+    "sender": "ai",
+    "content": "Uncertainty about job security can be very stressful. While I can't speak to company decisions, I can help you think through your options and coping strategies. What concerns you most?",
+    "timestamp": "2025-10-19T14:00:45Z",
+    "is_anonymous": true
+  },
+  {
+    "id": 21,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "Today was better. I talked to my manager about my workload and we're redistributing some tasks.",
+    "timestamp": "2025-10-20T14:15:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 22,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "That's great progress! Taking the initiative to communicate with your manager shows strong self-advocacy. How are you feeling about the changes?",
+    "timestamp": "2025-10-20T14:15:30Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 23,
+    "employee_id": "EMP008",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm excited about the new mentorship program! I signed up to be a mentee.",
+    "timestamp": "2025-10-20T09:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 24,
+    "employee_id": "EMP008",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "That's wonderful! Mentorship can be incredibly valuable for career growth. What are you hoping to gain from the experience?",
+    "timestamp": "2025-10-20T09:00:25Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 25,
+    "employee_id": "EMP009",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I received critical feedback on my presentation and I'm feeling discouraged.",
+    "timestamp": "2025-10-17T15:30:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 26,
+    "employee_id": "EMP009",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Receiving critical feedback can be tough. Remember, feedback is an opportunity for growth. What specific areas did they mention?",
+    "timestamp": "2025-10-17T15:30:40Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 27,
+    "employee_id": "EMP010",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm really enjoying my new role! The challenges are stimulating and I'm learning so much.",
+    "timestamp": "2025-10-18T10:15:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 28,
+    "employee_id": "EMP010",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "That's fantastic! It sounds like you're thriving in this new environment. What's been the most exciting part?",
+    "timestamp": "2025-10-18T10:15:30Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 29,
+    "employee_id": "EMP011",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm struggling with imposter syndrome. I don't feel like I belong here.",
+    "timestamp": "2025-10-19T11:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 30,
+    "employee_id": "EMP011",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Imposter syndrome is very common, especially among high achievers. You were hired for a reason. Can you tell me about your recent accomplishments?",
+    "timestamp": "2025-10-19T11:00:50Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 31,
+    "employee_id": "EMP012",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm feeling overwhelmed by my responsibilities. I think I took on too much.",
+    "timestamp": "2025-10-16T13:20:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 32,
+    "employee_id": "EMP012",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "It's important to recognize when you're stretched too thin. Let's talk about prioritization and what you might be able to delegate.",
+    "timestamp": "2025-10-16T13:20:45Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 33,
+    "employee_id": "EMP013",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "My team just won an industry award! I'm so proud of what we've achieved together.",
+    "timestamp": "2025-10-19T16:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 34,
+    "employee_id": "EMP013",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Congratulations! That's a remarkable achievement. What do you think contributed most to your team's success?",
+    "timestamp": "2025-10-19T16:00:30Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 35,
+    "employee_id": "EMP014",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm having trouble sleeping because I keep thinking about work problems.",
+    "timestamp": "2025-10-18T22:30:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 36,
+    "employee_id": "EMP014",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Sleep issues related to work stress are concerning. Have you tried any relaxation techniques before bed? It might also help to talk through what's on your mind.",
+    "timestamp": "2025-10-18T22:30:55Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 37,
+    "employee_id": "EMP015",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm feeling motivated after attending the company training session today.",
+    "timestamp": "2025-10-20T16:45:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 38,
+    "employee_id": "EMP015",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "That's great to hear! Training can really reinvigorate our perspective. What new skills or insights did you gain?",
+    "timestamp": "2025-10-20T16:45:25Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 39,
+    "employee_id": "EMP016",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I made a significant mistake on a client project and I'm worried about the consequences.",
+    "timestamp": "2025-10-17T09:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 40,
+    "employee_id": "EMP016",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Mistakes happen to everyone. What's important is how we respond to them. Have you spoken with your manager about it?",
+    "timestamp": "2025-10-17T09:00:50Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 41,
+    "employee_id": "EMP017",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm feeling isolated working remotely. I miss the office environment.",
+    "timestamp": "2025-10-16T14:30:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 42,
+    "employee_id": "EMP017",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Remote work isolation is a real challenge. Have you considered scheduling virtual coffee chats with colleagues or exploring hybrid work options?",
+    "timestamp": "2025-10-16T14:30:40Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 43,
+    "employee_id": "EMP018",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm excited about the upcoming company retreat! It'll be great to connect with everyone.",
+    "timestamp": "2025-10-20T11:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 44,
+    "employee_id": "EMP018",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Company retreats are wonderful for team bonding! What are you most looking forward to?",
+    "timestamp": "2025-10-20T11:00:20Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 45,
+    "employee_id": "EMP019",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I'm struggling with a difficult client who has unrealistic expectations.",
+    "timestamp": "2025-10-19T15:15:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 46,
+    "employee_id": "EMP019",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Difficult clients can be draining. Setting clear boundaries and managing expectations is key. How have you been communicating with them so far?",
+    "timestamp": "2025-10-19T15:15:50Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 47,
+    "employee_id": "EMP020",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "I just received a promotion! I'm thrilled but also nervous about the new responsibilities.",
+    "timestamp": "2025-10-20T10:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 48,
+    "employee_id": "EMP020",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "Congratulations on your promotion! It's natural to feel both excited and nervous. What aspects of the new role are you most concerned about?",
+    "timestamp": "2025-10-20T10:00:40Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 49,
+    "employee_id": "EMP004",
+    "anon_session_id": null,
+    "sender": "user",
+    "content": "Things are improving. I organized a team lunch and we had great conversations.",
+    "timestamp": "2025-10-20T13:00:00Z",
+    "is_anonymous": false
+  },
+  {
+    "id": 50,
+    "employee_id": "EMP004",
+    "anon_session_id": null,
+    "sender": "ai",
+    "content": "That's wonderful initiative! Building connections through informal gatherings can really strengthen team dynamics.",
+    "timestamp": "2025-10-20T13:00:30Z",
+    "is_anonymous": false
   }
 ]

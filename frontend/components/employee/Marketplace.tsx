@@ -7,6 +7,7 @@ import {
   Smartphone, Award, ShoppingCart, CheckCircle2 
 } from 'lucide-react';
 import { Alert, AlertDescription } from '../ui/alert';
+import { CartesianAxis } from 'recharts';
 
 interface MarketplaceProps {
   points: number;
@@ -23,8 +24,17 @@ const marketplaceItems = [
     category: 'Food & Drink',
     inStock: true,
   },
+   {
+    id: 2, 
+    name: '$5 NTUC Voucher',
+    description: 'Voucher valid at all NTUC outlets',
+    points: 100,
+    icon: Gift,
+    category: 'Groceries',
+    inStock: true,
+  },
   {
-    id: 2,
+    id: 3,
     name: 'Book of Your Choice',
     description: 'Select any book up to $30',
     points: 200,
@@ -33,21 +43,12 @@ const marketplaceItems = [
     inStock: true,
   },
   {
-    id: 3,
+    id: 4,
     name: 'Movie Tickets (2x)',
     description: 'Two tickets to any theater',
     points: 300,
     icon: Ticket,
     category: 'Entertainment',
-    inStock: true,
-  },
-  {
-    id: 4,
-    name: 'Extra Day Off',
-    description: 'One additional paid day off',
-    points: 500,
-    icon: Gift,
-    category: 'Time Off',
     inStock: true,
   },
   {
@@ -67,7 +68,8 @@ const marketplaceItems = [
     icon: Award,
     category: 'Career',
     inStock: true,
-  },
+  }
+ 
 ];
 
 export default function Marketplace({ points, onPointsUpdate }: MarketplaceProps) {
@@ -93,14 +95,14 @@ export default function Marketplace({ points, onPointsUpdate }: MarketplaceProps
       {/* Header */}
       <Card className="border border-[#D0E8F5]">
         <CardHeader className="border-b border-[#E8F3F9]">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingCart className="w-5 h-5 text-[#4167B1]" />
                 Rewards Marketplace
               </CardTitle>
               <CardDescription>
-                Redeem your earned points for exciting rewards
+                Redeem your earned points for exciting rewards!
               </CardDescription>
             </div>
             <div className="text-right">
@@ -113,8 +115,7 @@ export default function Marketplace({ points, onPointsUpdate }: MarketplaceProps
 
       {/* Recent Purchase Alert */}
       {recentPurchase && (
-        <Alert className="border-green-500/20 bg-green-50">
-          <CheckCircle2 className="w-4 h-4 text-green-600" />
+        <Alert className="border-green-500/20 bg-green-50 inline-block">
           <AlertDescription>
             <strong>Success!</strong> You've redeemed {recentPurchase}. Check your email for details.
           </AlertDescription>
@@ -195,7 +196,7 @@ export default function Marketplace({ points, onPointsUpdate }: MarketplaceProps
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <span>Complete a course</span>
-            <Badge variant="secondary">100-250 pts</Badge>
+            <Badge variant="secondary">50-100 pts</Badge>
           </div>
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <span>Mentor a colleague</span>
