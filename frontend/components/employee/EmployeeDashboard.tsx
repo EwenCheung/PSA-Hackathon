@@ -50,7 +50,7 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-sm text-gray-600">Your Points</p>
+                <p className="text-sm text-center text-gray-600">Your Points</p>
                 <Badge variant="secondary" className="text-lg">
                   {points} pts
                 </Badge>
@@ -90,8 +90,6 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
             <CareerPath 
               employeeId={employee.id} 
               profile={employee}
-              points={points}
-              onPointsUpdate={handlePointsUpdate}
             />
           </TabsContent>
 
