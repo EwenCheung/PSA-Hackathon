@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
+
 import { LogOut, GraduationCap, MessageCircle, ShoppingBag, Users, User } from 'lucide-react';
 import CareerPath from './CareerPath';
 import ChatSupport from './ChatSupport';
 import Marketplace from './Marketplace';
 import MentorshipHub from './MentorshipHub';
+import MentorMatching from './MentorMatching';
+
 import { Badge } from '../ui/badge';
 import type { EmployeeProfile, EmployeeSession } from '../../src/types/employee';
 
@@ -72,6 +75,10 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
               <GraduationCap className="w-4 h-4" />
               Career Path
             </TabsTrigger>
+            <TabsTrigger value="mentor" className="gap-2">
+              <Users className="w-4 h-4" />
+              Mentor Matching
+            </TabsTrigger>
             <TabsTrigger value="wellbeing" className="gap-2">
               <MessageCircle className="w-4 h-4" />
               Wellbeing Support
@@ -92,6 +99,13 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
               profile={employee}
               points={points}
               onPointsUpdate={handlePointsUpdate}
+            />
+          </TabsContent>
+
+          <TabsContent value="mentor">
+            <MentorMatching 
+              employeeId={employeeId} 
+              employeeData={mockEmployeeData}
             />
           </TabsContent>
 
