@@ -622,6 +622,7 @@ def generate_employee_insights(conn):
             career.get("text_summary", ""), json.dumps(courses)
         ))
         conn.commit()
+        break
 
     print("✅ Employee insights generated and saved!")
 
