@@ -1,107 +1,86 @@
-# PSA-Hackathon (PathForger)
-Short repo README to onboard developers quickly. Contains frontend and backend run instructions, data locations, and agent/embeddings notes.
+# PSA Hackathon (PathForger)
+Monorepo containing a FastAPI backend and a Vite/React frontend for the PSA Hackathon prototype. Use the automation in `Prototype_ThreeMusketeer/` to spin up both services consistently.
 
-## Project overview
-- Monorepo with two main areas:
-  - `frontend/` — Vite + React + TypeScript UI (components under `components/`).
-  - `backend/` — Python services and data layer under `backend/src/app/` (agents, repositories, seeds, DB).
-
-This project prototypes a course-recommendation agent that uses repository-backed seed data, embeddings, and a small LangChain-based agent.
-
-## Quick start (developer)
-
-Prerequisites
-- Node 18+ / npm or pnpm for frontend
-- Python 3.10+ (3.11 recommended) and virtualenv/venv for backend
-
-1) Start the frontend
+## Quick start
+- `Prototype_ThreeMusketeer/start_server.sh` orchestrates the full stack. Run with `--dry-run` first if you want to preview the commands.
+- The launcher performs:
+  1. Navigate to `backend/`, run `uv sync`, activate `.venv`, and launch `uvicorn app.main:app --reload` on port 8000.
+  2. Navigate to `frontend/`, run `npm install`, and start `npm run dev` (Vite on port 5173).
+- On errors the script reminds you to shut down conflicting servers (FastAPI or Vite) before retrying.
 
 ```bash
-cd frontend
-npm install
-npm run dev
+cd Prototype_ThreeMusketeer
+bash start_server.sh             # start both servers (Ctrl+C stops them)
+bash start_server.sh --dry-run   # preview commands only
 ```
 
-The UI runs on Vite (default port 5173). `frontend-sample/` is a duplicate/reference app — confirm which to modify before sweeping changes.
+### Manual startup (alternative workflow)
+If you prefer to launch services manually, follow the flow many teammates use:
 
-2) Backend setup
+1. Backend terminal
+   ```bash
+   cd backend
+   uv sync
+   source .venv/bin/activate
+   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --app-dir src
+   ```
+   Wait for the backend to finish initial sync and boot (typically 5–10 minutes on first run) before starting the frontend.
 
-Create and activate a Python virtual environment, install dependencies (if `requirements.txt` exists), and set `PYTHONPATH` so `backend/src` is importable:
+2. Frontend terminal (new shell window/tab)
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt   # if present
-export PYTHONPATH=$(pwd)/src
-```
+This path mirrors what the launcher automates, but gives you granular control over each process.
 
-3) Environment variables
+## Architecture Overview
+- **Platform vision**: PathForger is an AI-powered growth platform helping employees build leadership potential while giving employers a real-time picture of workforce readiness.
+- **Modular AI agents**: The backend hosts dedicated agents for course recommendations, wellbeing analysis, leadership evaluation, and mentor matching. Each agent encapsulates prompts, policies, and data pipelines for its domain.
+- **Vector intelligence**: Skill, role, and goal data are embedded into a vector index so the recommendation agent can surface the top courses for each employee with explanations.
+- **Central data hub**: A secure SQL database stores employee profiles, skill taxonomies, engagement telemetry, and mentorship activity. Repositories in `backend/src/app/data/` abstract reads/writes.
+- **Extensibility**: The service layer is designed to plug into enterprise systems (e.g., SAP, Workday) by swapping repository adapters without touching the agent logic.
+- **Front-end shell**: React + Vite provide a responsive experience, with view modules composed so that Employee and Employer dashboards share UI primitives while presenting role-specific insights.
 
-Create a `.env` in `backend/` with at least the following for Azure OpenAI usage (if you use embeddings/LLM):
+## Employee View Experience
+- **Personalised course intelligence**: Employees sign in, trigger the embeddings pipeline, and receive the top three course matches with rationale anchored to their skills, aspirations, and current role.
+- **Career path navigator**: A roadmap breaks growth into short-term (0–6 months), mid-term (6–18 months), and long-term (18+ months) stages with focus areas, actions, and likely future roles.
+- **Leadership readiness scoring**: Agents evaluate proactive learning, skill velocity, and emotional steadiness to flag leadership potential and highlight improvement levers.
+- **Mentorship orchestration**: Requests go through an AI matcher that pairs mentees with mentors based on expertise, goals, and compatibility. The agent keeps sessions on track, nudging both sides if progress stalls.
+- **Wellbeing agent**: Sentiment analysis monitors mood shifts, suggests interventions, routes to resources, and coordinates schedules to prevent burnout while respecting privacy.
+- **Gamification layer**: Employees earn redeemable points by completing courses, mentoring colleagues, reaching milestones, and maintaining wellbeing streaks—turning growth into a rewarding loop.
 
-```env
-AZURE_OPENAI_API_KEY=sk-...
-DEPLOYMENT=text-embedding-3-small
-API_VERSION=2023-05-15
-AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net
-```
+## Employer Insights Dashboard
+- **Real-time workforce intelligence**: Dashboards surface top performers, leadership candidates, and emerging skill gaps so managers can prioritise interventions.
+- **Single-load analytics**: Insights hydrate once from the database, then stream updates, tracking course adoption, skill trends, and engagement momentum without reloading the full view.
+- **Mentorship oversight**: Employers observe mentor capacity, request queues, and programme health, receiving alerts when pairings need support.
+- **Strategic planning**: Aggregated analytics spotlight future leaders, critical skill shortages, and training ROI, enabling data-driven promotion and reskilling decisions.
 
-Note: some modules set `AZURE_OPENAI_ENDPOINT` or `AZURE_OPENAI_API_KEY` into `os.environ` at runtime; ensure your `.env` values are present before importing agent modules.
+## Vision and Roadmap
+- **Holistic growth**: PathForger unites learning, leadership development, wellbeing, and gamification so employees see a full 360° view of their career trajectory.
+- **Actionable employer value**: Organisations translate platform telemetry into targeted training, balanced mentorship programmes, and early identification of leadership pipelines.
+- **Future-ready evolution**: The modular architecture keeps the platform adaptable, paving the way for deeper enterprise integrations, additional agents, and region-specific content.
+- **Where growth meets opportunity**: By aligning engagement, insight, and development, PathForger forges leaders while keeping teams energised for what’s next.
 
-## Database & seed data
-- SQLite DB (expected path): `backend/src/app/data/database/app.db`
-- Seed JSON files: `backend/src/app/data/seeds/*.json` (examples: `courses.json`, `skills.json`, `course_skills.json`, `employees.json`)
-- Repositories (read/write and sync logic) live under `backend/src/app/data/repositories/`.
+## Backend notes
+- Code lives in `backend/src/app/` (agents, repositories, and data files under `data/`).
+- Requires Python 3.10+ and the [`uv`](https://github.com/astral-sh/uv) tool for dependency syncing. After activation, the FastAPI app is served at `http://localhost:8000`.
+- Seed JSON and the SQLite database reside under `backend/src/app/data/` (check `database/app.db`).
 
-To sync `course_skills.json` into the DB (script provided):
+## Frontend notes
+- Vite + React (TypeScript) lives in `frontend/` with shared UI primitives under `src/components/`.
+- `npm run dev` serves the UI on `http://localhost:5173` with hot reload.
 
-```bash
-export PYTHONPATH=$(pwd)/src
-python backend/src/app/data/repositories/sync_course_skills.py
-```
-
-The sync script will look for the DB at `backend/src/app/data/database/app.db` and the JSON at `backend/src/app/data/seeds/course_skills.json`.
-
-## Agent & embeddings (where things live)
-- Agent entrypoint: `backend/src/app/agent/course_recommendation_agent/main.py` — responsible for loading `.env`, instantiating the LLM (`AzureChatOpenAI`), creating the agent, and invoking it.
-- Tooling: `backend/src/app/agent/course_recommendation_agent/tools.py` — exposes `recommend_courses_tool` and `get_employee_context`. This module reads data from the repository layer and builds documents for embedding.
-- Embeddings & vectorstore: currently built in `tools.py` during initialization in this tree. For production or larger data sets, prefer extracting this logic into a lazy provider (e.g., `embeddings_store.py`) that builds/persists the FAISS index on first use.
-
-Important runtime notes
-- Building FAISS/embeddings at import time may block or fail if environment variables or packages are missing. Tests and CLI scripts in this repo add defensive fallbacks; if you see import errors, ensure `PYTHONPATH` and `.env` are set before running.
-- If `langchain` / `faiss` imports fail, the tools include keyword-overlap fallbacks so the service can still return recommendations (less accurate than embeddings).
-
-## Useful quick commands
-- Run agent main (example):
-
-```bash
-export PYTHONPATH=$(pwd)/backend/src
-python backend/src/app/agent/course_recommendation_agent/main.py
-```
-
-- Run the tools self-test to print sample courses/employees/skills:
-
-```bash
-export PYTHONPATH=$(pwd)/backend/src
-python backend/src/app/agent/course_recommendation_agent/tools.py
-```
-
-## Project structure (high level)
-- backend/
-  - src/app/agent/course_recommendation_agent/  (agent main, tools, system prompts)
-  - src/app/data/repositories/  (CourseRepository, CourseSkillRepository, EmployeeRepository, SkillRepository, sync scripts)
-  - src/app/data/seeds/  (seed JSONs)
-  - src/app/data/database/  (SQLite DB: app.db)
-- frontend/  (Vite + React UI)
+## Testing & validation
+- Shell smoke tests live under `tests/`. Run `tests/test_start_server.sh` to ensure the launcher script keeps its contract intact.
+- Add Python tests under `backend/tests/` (pytest) and frontend tests under `frontend/src/__tests__/` (Vitest) as features grow.
 
 ## Troubleshooting
-- If imports for `langchain`, `langchain_openai`, or `faiss` fail, either install the required packages (see `requirements.txt`) or run the backend self-test which uses fallbacks.
-- If the sync script reports the DB not found, confirm `backend/src/app/data/database/app.db` exists and that you ran it with `PYTHONPATH` set to `backend/src`.
-- If the agent prints unexpected response objects, run `main.py` and paste the printed repr; the codebase already includes tolerant response printers that can be extended.
+- `uv sync` failures: ensure the `.venv` folder exists and no other Python process is locking dependencies.
+- Port conflicts: stop existing FastAPI or Vite instances (`lsof -i :8000` / `lsof -i :5173`) before re-running the launcher.
+- `npm install` permission errors often stem from global cache issues; clear `~/.npm` or retry after closing other Node processes.
 
-## Contributing
-- Add small, focused PRs. When adding backend services, include a `README`, `.env.example`, and tests.
-- Keep UI changes in `frontend/` and reuse `components/ui/` primitives.
-
-If you'd like, I can scaffold `embeddings_store.py` (lazy vectorstore provider) and a `db.py` connection helper and update `tools.py`/`main.py` to use them — say the word and I will implement it.
+## Contributing guidelines
+- Keep backend and frontend changes in separate commits when practical.
+- Document new automation or setup steps in `Prototype_ThreeMusketeer/README.md` so the whole team stays aligned.
