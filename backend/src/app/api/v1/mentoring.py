@@ -277,36 +277,27 @@ async def list_mentors(
         )
 
 
-# @router.get("/mentors/{employee_id}", response_model=MentorProfile)
-# async def get_mentor(employee_id: str):
-#     """
-#     Get a specific mentor's profile by employee ID.
-    
-#     Args:
-#         employee_id: The mentor's employee identifier
-        
-#     Returns:
-#         MentorProfile: Mentor profile information
-        
-#     Raises:
-#         HTTPException: 404 if mentor not found
-#     """
-#     try:
-#         mentor = next((m for m in MOCK_MENTORS if m["employeeId"] == employee_id), None)
-#         if not mentor:
-#             raise HTTPException(
-#                 status_code=status.HTTP_404_NOT_FOUND,
-#                 detail=f"Mentor {employee_id} not found"
-#             )
-#         return MentorProfile(**mentor)
-    
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail=f"Internal error: {str(e)}"
-#         )
+@router.get("/mentors/{employee_id}", response_model=MentorProfile)
+async def get_mentor(employee_id: str):
+    """
+    Get a specific mentor's profile by employee ID.
+
+    Args:
+        employee_id: The mentor's employee identifier
+
+    Returns:
+        MentorProfile: Mentor profile information
+
+    Raises:
+        HTTPException: 404 if mentor not found
+    """
+    mentor = next((m for m in MOCK_MENTORS if m["employeeId"] == employee_id), None)
+    if mentor is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Mentor {employee_id} not found",
+        )
+    return MentorProfile(**mentor)
 
 
 @router.post("/recommend", response_model=List[MentorRecommendation])

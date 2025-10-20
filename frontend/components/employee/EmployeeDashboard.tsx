@@ -6,7 +6,6 @@ import { LogOut, GraduationCap, MessageCircle, ShoppingBag, Users, User } from '
 import CareerPath from './CareerPath';
 import ChatSupport from './ChatSupport';
 import Marketplace from './Marketplace';
-import MentorshipHub from './MentorshipHub';
 import MentorMatching from './MentorMatching';
 
 import { Badge } from '../ui/badge';
@@ -28,6 +27,12 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
 
   const handlePointsUpdate = (newPoints: number) => {
     setPoints(newPoints);
+  };
+
+  const mentorMatchingEmployeeData = {
+    name: employee.name,
+    role: employee.role ?? 'Employee',
+    department: employee.department_id ?? 'Unknown',
   };
 
   return (
@@ -83,10 +88,6 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
               <MessageCircle className="w-4 h-4" />
               Wellbeing Support
             </TabsTrigger>
-            <TabsTrigger value="mentorship" className="gap-2">
-              <Users className="w-4 h-4" />
-              Mentorship Hub
-            </TabsTrigger>
             <TabsTrigger value="marketplace" className="gap-2">
               <ShoppingBag className="w-4 h-4" />
               Marketplace
@@ -97,24 +98,18 @@ export default function EmployeeDashboard({ employee, session, onLogout }: Emplo
             <CareerPath 
               employeeId={employee.id} 
               profile={employee}
-              points={points}
-              onPointsUpdate={handlePointsUpdate}
             />
           </TabsContent>
 
           <TabsContent value="mentor">
             <MentorMatching 
-              employeeId={employeeId} 
-              employeeData={mockEmployeeData}
+              employeeId={employee.id} 
+              employeeData={mentorMatchingEmployeeData}
             />
           </TabsContent>
 
           <TabsContent value="wellbeing">
             <ChatSupport employeeId={employee.id} />
-          </TabsContent>
-
-          <TabsContent value="mentorship">
-            <MentorshipHub employee={employee} />
           </TabsContent>
 
           <TabsContent value="marketplace">
