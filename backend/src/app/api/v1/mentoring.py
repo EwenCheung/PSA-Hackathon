@@ -21,7 +21,7 @@ Routes:
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from typing import List, Optional, Dict, Any
+from typing import AsyncGenerator, List, Optional, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 import os
 
@@ -36,7 +36,7 @@ router = APIRouter(
 )
 
 
-def get_matching_service() -> MentorMatchingService:
+async def get_matching_service() -> AsyncGenerator[MentorMatchingService, None]:
     conn = get_connection()
     try:
         init_db(conn)
@@ -44,7 +44,7 @@ def get_matching_service() -> MentorMatchingService:
         cur.execute("SELECT COUNT(*) FROM employees")
         count = cur.fetchone()[0]
         if count == 0:
-            load_all_seeds(conn)
+            load_all_seeds(conn, generate_insights=False)
         yield MentorMatchingService(conn)
     finally:
         conn.close()

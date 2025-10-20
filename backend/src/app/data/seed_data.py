@@ -610,7 +610,7 @@ def generate_employee_insights(conn):
     print("✅ Employee insights generated and saved!")
 
 
-def load_all_seeds(conn):
+def load_all_seeds(conn, generate_insights: bool = True):
     print("\n🌱 Loading seed data...")
     print("=" * 60)
     load_departments(conn)
@@ -622,8 +622,9 @@ def load_all_seeds(conn):
     load_marketplace_items(conn)
     load_goals(conn)
 
-    # Generate employee insights only if not already generated
-    generate_employee_insights(conn)
+    if generate_insights:
+        # Generate employee insights only if not already generated
+        generate_employee_insights(conn)
 
     print("=" * 60)
     print("✅ All seed data + insights loaded successfully!\n")
