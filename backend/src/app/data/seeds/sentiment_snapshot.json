@@ -24,9 +24,229 @@
     "employee_id": "EMP001",
     "anon_session_id": null,
     "day": "2025-10-19",
-    "label": "concerned",
+    "label": "negative",
     "average_score": -0.4,
     "messages_count": 1,
     "created_at": "2025-10-19T09:15:00Z"
+  },
+  {
+    "id": 4,
+    "employee_id": "EMP003",
+    "anon_session_id": null,
+    "day": "2025-10-16",
+    "label": "negative",
+    "average_score": -0.5,
+    "messages_count": 1,
+    "created_at": "2025-10-16T16:45:00Z"
+  },
+  {
+    "id": 5,
+    "employee_id": "EMP004",
+    "anon_session_id": null,
+    "day": "2025-10-17",
+    "label": "negative",
+    "average_score": -0.3,
+    "messages_count": 1,
+    "created_at": "2025-10-17T11:20:00Z"
+  },
+  {
+    "id": 6,
+    "employee_id": "EMP005",
+    "anon_session_id": null,
+    "day": "2025-10-18",
+    "label": "positive",
+    "average_score": 0.9,
+    "messages_count": 1,
+    "created_at": "2025-10-18T15:30:00Z"
+  },
+  {
+    "id": 7,
+    "employee_id": "EMP002",
+    "anon_session_id": null,
+    "day": "2025-10-19",
+    "label": "neutral",
+    "average_score": 0.1,
+    "messages_count": 1,
+    "created_at": "2025-10-19T13:45:00Z"
+  },
+  {
+    "id": 8,
+    "employee_id": "EMP006",
+    "anon_session_id": null,
+    "day": "2025-10-19",
+    "label": "negative",
+    "average_score": -0.6,
+    "messages_count": 1,
+    "created_at": "2025-10-19T10:10:00Z"
+  },
+  {
+    "id": 9,
+    "employee_id": "EMP003",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "negative",
+    "average_score": -0.8,
+    "messages_count": 1,
+    "created_at": "2025-10-20T08:30:00Z"
+  },
+  {
+    "id": 10,
+    "employee_id": null,
+    "anon_session_id": "ANON123456",
+    "day": "2025-10-19",
+    "label": "negative",
+    "average_score": -0.7,
+    "messages_count": 1,
+    "created_at": "2025-10-19T14:00:00Z"
+  },
+  {
+    "id": 11,
+    "employee_id": "EMP001",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "positive",
+    "average_score": 0.5,
+    "messages_count": 1,
+    "created_at": "2025-10-20T14:15:00Z"
+  },
+  {
+    "id": 12,
+    "employee_id": "EMP008",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "positive",
+    "average_score": 0.7,
+    "messages_count": 1,
+    "created_at": "2025-10-20T09:00:00Z"
+  },
+  {
+    "id": 13,
+    "employee_id": "EMP009",
+    "anon_session_id": null,
+    "day": "2025-10-17",
+    "label": "negative",
+    "average_score": -0.6,
+    "messages_count": 1,
+    "created_at": "2025-10-17T15:30:00Z"
+  },
+  {
+    "id": 14,
+    "employee_id": "EMP010",
+    "anon_session_id": null,
+    "day": "2025-10-18",
+    "label": "positive",
+    "average_score": 0.85,
+    "messages_count": 1,
+    "created_at": "2025-10-18T10:15:00Z"
+  },
+  {
+    "id": 15,
+    "employee_id": "EMP011",
+    "anon_session_id": null,
+    "day": "2025-10-19",
+    "label": "negative",
+    "average_score": -0.65,
+    "messages_count": 1,
+    "created_at": "2025-10-19T11:00:00Z"
+  },
+  {
+    "id": 16,
+    "employee_id": "EMP012",
+    "anon_session_id": null,
+    "day": "2025-10-16",
+    "label": "negative",
+    "average_score": -0.55,
+    "messages_count": 1,
+    "created_at": "2025-10-16T13:20:00Z"
+  },
+  {
+    "id": 17,
+    "employee_id": "EMP013",
+    "anon_session_id": null,
+    "day": "2025-10-19",
+    "label": "positive",
+    "average_score": 0.95,
+    "messages_count": 1,
+    "created_at": "2025-10-19T16:00:00Z"
+  },
+  {
+    "id": 18,
+    "employee_id": "EMP014",
+    "anon_session_id": null,
+    "day": "2025-10-18",
+    "label": "negative",
+    "average_score": -0.75,
+    "messages_count": 1,
+    "created_at": "2025-10-18T22:30:00Z"
+  },
+  {
+    "id": 19,
+    "employee_id": "EMP015",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "positive",
+    "average_score": 0.65,
+    "messages_count": 1,
+    "created_at": "2025-10-20T16:45:00Z"
+  },
+  {
+    "id": 20,
+    "employee_id": "EMP016",
+    "anon_session_id": null,
+    "day": "2025-10-17",
+    "label": "negative",
+    "average_score": -0.7,
+    "messages_count": 1,
+    "created_at": "2025-10-17T09:00:00Z"
+  },
+  {
+    "id": 21,
+    "employee_id": "EMP017",
+    "anon_session_id": null,
+    "day": "2025-10-16",
+    "label": "negative",
+    "average_score": -0.45,
+    "messages_count": 1,
+    "created_at": "2025-10-16T14:30:00Z"
+  },
+  {
+    "id": 22,
+    "employee_id": "EMP018",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "positive",
+    "average_score": 0.75,
+    "messages_count": 1,
+    "created_at": "2025-10-20T11:00:00Z"
+  },
+  {
+    "id": 23,
+    "employee_id": "EMP019",
+    "anon_session_id": null,
+    "day": "2025-10-19",
+    "label": "negative",
+    "average_score": -0.6,
+    "messages_count": 1,
+    "created_at": "2025-10-19T15:15:00Z"
+  },
+  {
+    "id": 24,
+    "employee_id": "EMP020",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "positive",
+    "average_score": 0.6,
+    "messages_count": 1,
+    "created_at": "2025-10-20T10:00:00Z"
+  },
+  {
+    "id": 25,
+    "employee_id": "EMP004",
+    "anon_session_id": null,
+    "day": "2025-10-20",
+    "label": "positive",
+    "average_score": 0.55,
+    "messages_count": 1,
+    "created_at": "2025-10-20T13:00:00Z"
   }
 ]
