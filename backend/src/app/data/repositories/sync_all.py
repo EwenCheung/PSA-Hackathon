@@ -19,12 +19,12 @@ def sync_all():
     course_skill_repo.sync_from_json()
     
     # Sync employees
-    # employee_repo = EmployeeRepository(conn)
-    # employee_repo.sync_from_json()
+    employee_repo = EmployeeRepository(conn)
+    employee_repo.sync_from_json()
     
     # Sync purchase history
-    purchase_repo = PurchaseHistoryRepository(conn)
-    purchase_repo.sync_from_json()
+    # purchase_repo = PurchaseHistoryRepository(conn)
+    # purchase_repo.sync_from_json()
 
     conn.close()
     print("All data synced successfully!")
