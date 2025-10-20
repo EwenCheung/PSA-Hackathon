@@ -77,6 +77,10 @@ class EmployeeRepository(BaseRepository):
             "hire_date": emp["hire_date"],
         }
 
+    def get_employee_row(self, employee_id: str) -> Optional[dict]:
+        """Return raw employee row without normalization."""
+        return self.get_by_id(self.TABLE, self.ID_FIELD, employee_id)
+
     # ---------- Sync from JSON ----------
     # def sync_from_json(self):
     #     """Load employees.json and sync the employees table."""

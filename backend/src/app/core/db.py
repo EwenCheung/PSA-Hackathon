@@ -13,7 +13,10 @@ import os
 import sqlite3
 from typing import Iterable, Mapping
 
-from app.data.migrations import ensure_position_level_column
+from app.data.migrations import (
+    ensure_position_level_column,
+    ensure_mentor_request_history_schema,
+)
 from app.data.utils.position_level import derive_position_level
 
 
@@ -231,7 +234,6 @@ def init_db(conn: sqlite3.Connection) -> None:
             explanation TEXT,
             status TEXT,
             created_at TEXT,
-            UNIQUE(mentee_id),
             FOREIGN KEY (mentee_id) REFERENCES employees(id),
             FOREIGN KEY (mentor_id) REFERENCES employees(id)
         )
@@ -251,6 +253,8 @@ def init_db(conn: sqlite3.Connection) -> None:
         )
         """
     )
+
+    ensure_mentor_request_history_schema(conn)
 
     # Rewards & Points
     cur.execute(

@@ -20,17 +20,34 @@ Routes:
 - POST /api/v1/mentoring/agent/chat (AI Assistant)
 """
 
-from fastapi import APIRouter, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from typing import List, Optional, Dict, Any
-from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
 import os
+
+from app.core.db import get_connection, init_db
+from app.data.seed_data import load_all_seeds
+from app.services.mentor_match_request_service import MentorMatchingService
 
 # Create router
 router = APIRouter(
     prefix="/api/v1/mentoring",
     tags=["Mentoring"],
 )
+
+
+def get_matching_service() -> MentorMatchingService:
+    conn = get_connection()
+    try:
+        init_db(conn)
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM employees")
+        count = cur.fetchone()[0]
+        if count == 0:
+            load_all_seeds(conn)
+        yield MentorMatchingService(conn)
+    finally:
+        conn.close()
 
 
 # ============================================================================
@@ -171,193 +188,87 @@ class AgentChatResponse(BaseModel):
         }
 
 
-# ============================================================================
-# MOCK DATA (Replace with database queries in production)
-# ============================================================================
-
-MOCK_MENTORS = [
-    {
-        "employeeId": "EMP001",
-        "name": "Sarah Chen",
-        "role": "Senior Operations Manager",
-        "department": "Operations",
-        "expertiseAreas": ["Leadership", "Strategic Planning", "Operations Management"],
-        "rating": 4.8,
-        "menteesCount": 3,
-        "maxMentees": 5,
-        "isAvailable": True,
-        "bio": "15+ years in operations with focus on leadership development",
-        "yearsOfExperience": 15,
-        "achievements": ["Leadership Excellence Award 2023", "Mentor of the Year 2022"]
-    },
-    {
-        "employeeId": "EMP002",
-        "name": "Michael Rodriguez",
-        "role": "Technology Director",
-        "department": "IT",
-        "expertiseAreas": ["Technical Skills", "Innovation", "Digital Transformation"],
-        "rating": 4.9,
-        "menteesCount": 2,
-        "maxMentees": 4,
-        "isAvailable": True,
-        "bio": "Tech leader with expertise in digital transformation",
-        "yearsOfExperience": 12,
-        "achievements": ["Innovation Award 2024"]
-    },
-    {
-        "employeeId": "EMP003",
-        "name": "Jennifer Park",
-        "role": "HR Business Partner",
-        "department": "Human Resources",
-        "expertiseAreas": ["HR Management", "Team Building", "Communication"],
-        "rating": 4.7,
-        "menteesCount": 4,
-        "maxMentees": 4,
-        "isAvailable": False,
-        "bio": "Passionate about employee development and team dynamics",
-        "yearsOfExperience": 10,
-        "achievements": []
-    },
-    {
-        "employeeId": "EMP004",
-        "name": "David Kumar",
-        "role": "Senior Business Analyst",
-        "department": "Analytics",
-        "expertiseAreas": ["Analytics", "Process Optimization", "Data-Driven Decision Making"],
-        "rating": 4.6,
-        "menteesCount": 2,
-        "maxMentees": 5,
-        "isAvailable": True,
-        "bio": "Expert in leveraging data for business insights",
-        "yearsOfExperience": 8,
-        "achievements": ["Analytics Excellence 2023"]
-    }
-]
-
-MOCK_REQUESTS = {}  # Will be populated as requests are created
-MOCK_PAIRS = {}  # Will be populated as requests are accepted
-
-
-# ============================================================================
-# ROUTE HANDLERS
-# ============================================================================
-
 @router.get("/mentors", response_model=List[MentorProfile])
 async def list_mentors(
     skill_area: Optional[str] = Query(None, description="Filter by skill area"),
-    department: Optional[str] = Query(None, description="Filter by department")
+    department: Optional[str] = Query(None, description="Filter by department"),
+    mentee_id: Optional[str] = Query(
+        None,
+        description="Only return mentors senior to this employee",
+        alias="mentee_id",
+    ),
+    service: MentorMatchingService = Depends(get_matching_service),
 ):
-    """
-    Get list of available mentors.
-    
-    Optionally filter by skill area or department.
-    
-    Args:
-        skill_area: Filter mentors by specific expertise area
-        department: Filter mentors by department
-        
-    Returns:
-        List[MentorProfile]: List of mentor profiles
-    """
     try:
-        mentors = MOCK_MENTORS.copy()
-        
-        if skill_area:
-            mentors = [m for m in mentors if skill_area.lower() in [area.lower() for area in m["expertiseAreas"]]]
-        
-        if department:
-            mentors = [m for m in mentors if m["department"].lower() == department.lower()]
-        
-        return [MentorProfile(**mentor) for mentor in mentors]
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
+        mentors = service.list_mentors(
+            mentee_id=mentee_id,
+            skill_area=skill_area,
+            department=department,
         )
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return [MentorProfile(**mentor) for mentor in mentors]
 
 
 @router.get("/mentors/{employee_id}", response_model=MentorProfile)
-async def get_mentor(employee_id: str):
-    """
-    Get a specific mentor's profile by employee ID.
-
-    Args:
-        employee_id: The mentor's employee identifier
-
-    Returns:
-        MentorProfile: Mentor profile information
-
-    Raises:
-        HTTPException: 404 if mentor not found
-    """
-    mentor = next((m for m in MOCK_MENTORS if m["employeeId"] == employee_id), None)
-    if mentor is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Mentor {employee_id} not found",
-        )
+async def get_mentor(
+    employee_id: str,
+    service: MentorMatchingService = Depends(get_matching_service),
+):
+    try:
+        mentor = service.get_mentor(employee_id)
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return MentorProfile(**mentor)
 
 
 @router.post("/recommend", response_model=List[MentorRecommendation])
-async def get_recommendations(request: MentorRecommendationRequest):
-    """
-    Get personalized mentor recommendations based on career goals and desired skills.
-    
-    Uses AI-powered matching algorithm to find the best mentors for your needs.
-    
-    Args:
-        request: Recommendation request with employee ID, goals, and desired skills
-        
-    Returns:
-        List[MentorRecommendation]: Ranked list of mentor recommendations
-    """
+async def get_recommendations(
+    request: MentorRecommendationRequest,
+    service: MentorMatchingService = Depends(get_matching_service),
+):
     try:
-        recommendations = []
-        
-        for mentor in MOCK_MENTORS:
-            if not mentor["isAvailable"]:
-                continue
-                
-            # Calculate match score based on expertise overlap
-            expertise_set = set(area.lower() for area in mentor["expertiseAreas"])
-            goals_set = set(goal.lower() for goal in request.careerGoals + request.desiredSkills)
-            
-            # Find overlapping areas
-            overlap = expertise_set.intersection(goals_set)
-            match_score = int((len(overlap) / len(goals_set)) * 100) if goals_set else 0
-            
-            # Boost score based on rating and availability
-            if mentor["menteesCount"] < mentor["maxMentees"]:
-                match_score = min(100, match_score + 10)
-            match_score = min(100, int(match_score * (mentor["rating"] / 5.0)))
-            
-            if match_score > 30:  # Only include decent matches
-                recommendations.append(
-                    MentorRecommendation(
-                        mentorId=mentor["employeeId"],
-                        mentorName=mentor["name"],
-                        role=mentor["role"],
-                        matchScore=match_score,
-                        reason=f"Strong expertise in {', '.join(list(overlap)[:2]) if overlap else 'relevant areas'}",
-                        focusAreas=mentor["expertiseAreas"][:3]
-                    )
-                )
-        
-        # Sort by match score and return top results
-        recommendations.sort(key=lambda x: x.matchScore, reverse=True)
-        return recommendations[:request.maxResults]
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
+        mentors = service.list_mentors(mentee_id=request.employeeId)
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    recommendations: List[MentorRecommendation] = []
+    goals_set = set(goal.lower() for goal in request.careerGoals + request.desiredSkills)
+
+    for mentor in mentors:
+        score = service.estimate_match_score(
+            mentor["employeeId"],
+            request.employeeId,
+            request.desiredSkills or request.careerGoals,
         )
+        if score <= 0:
+            continue
+        expertise_set = set(area.lower() for area in mentor["expertiseAreas"])
+        overlap = expertise_set.intersection(goals_set)
+        reason = (
+            f"Strong expertise in {', '.join(list(overlap)[:2])}"
+            if overlap
+            else "Relevant experience for your goals"
+        )
+        recommendations.append(
+            MentorRecommendation(
+                mentorId=mentor["employeeId"],
+                mentorName=mentor["name"],
+                role=mentor["role"],
+                matchScore=int(score),
+                reason=reason,
+                focusAreas=mentor["expertiseAreas"][:3],
+            )
+        )
+
+    recommendations.sort(key=lambda item: item.matchScore, reverse=True)
+    return recommendations[: request.maxResults]
 
 
 @router.post("/request", response_model=MentorshipRequest, status_code=status.HTTP_201_CREATED)
-async def create_request(request: MentorshipRequestCreate):
+async def create_request(
+    request: MentorshipRequestCreate,
+    service: MentorMatchingService = Depends(get_matching_service),
+):
     """
     Create a new mentorship request.
     
@@ -373,46 +284,21 @@ async def create_request(request: MentorshipRequestCreate):
         HTTPException: 404 if mentor not found
     """
     try:
-        # Find mentor details
-        mentor = next((m for m in MOCK_MENTORS if m["employeeId"] == request.mentorId), None)
-        if not mentor:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Mentor {request.mentorId} not found"
-            )
-        
-        request_id = f"REQ{len(MOCK_REQUESTS) + 1:03d}"
-        
-        new_request = {
-            "requestId": request_id,
-            "menteeId": request.menteeId,
-            "menteeName": "John Doe",  # In real app, fetch from employee data
-            "menteeRole": "Software Developer",
-            "mentorId": request.mentorId,
-            "mentorName": mentor["name"],
-            "message": request.message,
-            "goals": request.goals,
-            "status": "pending",
-            "createdAt": datetime.now().isoformat(),
-            "respondedAt": None
-        }
-        
-        MOCK_REQUESTS[request_id] = new_request
-        return MentorshipRequest(**new_request)
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
+        created = service.create_request(
+            request.menteeId, request.mentorId, request.message, request.goals
         )
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return MentorshipRequest(**created)
 
 
 @router.get("/requests", response_model=List[MentorshipRequest])
 async def list_requests(
     mentor_id: Optional[str] = Query(None, description="Filter by mentor ID"),
-    mentee_id: Optional[str] = Query(None, description="Filter by mentee ID")
+    mentee_id: Optional[str] = Query(None, description="Filter by mentee ID"),
+    service: MentorMatchingService = Depends(get_matching_service),
 ):
     """
     Get mentorship requests.
@@ -426,26 +312,16 @@ async def list_requests(
     Returns:
         List[MentorshipRequest]: List of mentorship requests
     """
-    try:
-        requests = list(MOCK_REQUESTS.values())
-        
-        if mentor_id:
-            requests = [r for r in requests if r["mentorId"] == mentor_id]
-        
-        if mentee_id:
-            requests = [r for r in requests if r["menteeId"] == mentee_id]
-        
-        return [MentorshipRequest(**req) for req in requests]
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
-        )
+    requests = service.list_requests(mentor_id=mentor_id, mentee_id=mentee_id)
+    return [MentorshipRequest(**req) for req in requests]
 
 
 @router.put("/requests/{request_id}", response_model=MentorshipRequest)
-async def update_request(request_id: str, update: MentorshipRequestUpdate):
+async def update_request(
+    request_id: str,
+    update: MentorshipRequestUpdate,
+    service: MentorMatchingService = Depends(get_matching_service),
+):
     """
     Update a mentorship request status (accept or decline).
     
@@ -462,54 +338,62 @@ async def update_request(request_id: str, update: MentorshipRequestUpdate):
         HTTPException: 404 if request not found
     """
     try:
-        if request_id not in MOCK_REQUESTS:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Request {request_id} not found"
-            )
-        
-        request = MOCK_REQUESTS[request_id]
-        request["status"] = update.status
-        request["respondedAt"] = datetime.now().isoformat()
-        
-        # If accepted, create a mentorship pair
-        if update.status == "accepted":
-            pair_id = f"PAIR{len(MOCK_PAIRS) + 1:03d}"
-            mentor = next((m for m in MOCK_MENTORS if m["employeeId"] == request["mentorId"]), None)
-            
-            pair = {
-                "pairId": pair_id,
-                "mentorId": request["mentorId"],
-                "mentorName": request["mentorName"],
-                "mentorRole": mentor["role"] if mentor else "Unknown",
-                "menteeId": request["menteeId"],
-                "menteeName": request["menteeName"],
-                "menteeRole": request["menteeRole"],
-                "startDate": datetime.now().isoformat(),
-                "focusAreas": request["goals"],
-                "status": "active",
-                "progressPercentage": 0,
-                "sessionsCompleted": 0,
-                "lastMeetingDate": None,
-                "nextMeetingDate": None
-            }
-            MOCK_PAIRS[pair_id] = pair
-        
-        return MentorshipRequest(**request)
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
+        numeric_id = int(request_id.replace("REQ", "")) if request_id.startswith("REQ") else int(request_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid request id") from exc
+
+    try:
+        updated = service.update_request_status(
+            numeric_id, update.status, update.responseMessage
         )
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return MentorshipRequest(**updated)
+
+
+@router.delete("/requests/{request_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_request(
+    request_id: str,
+    mentee_id: str = Query(..., description="Employee ID of the mentee withdrawing the request"),
+    service: MentorMatchingService = Depends(get_matching_service),
+) -> Response:
+    """
+    Cancel/withdraw a mentorship request.
+    
+    This marks the request as deleted (soft delete) rather than removing it from the database.
+    Only pending requests can be canceled. Accepted requests cannot be deleted.
+    
+    Args:
+        request_id: The request identifier (e.g., "REQ001" or "1")
+        mentee_id: Employee ID of the mentee who made the request
+        
+    Returns:
+        204 No Content on successful cancellation
+        
+    Raises:
+        HTTPException: 404 if request not found
+        HTTPException: 400 if request cannot be deleted or invalid parameters
+    """
+    try:
+        numeric_id = int(request_id.replace("REQ", "")) if request_id.startswith("REQ") else int(request_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid request id") from exc
+
+    try:
+        service.delete_request(numeric_id, mentee_id)
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/pairs", response_model=List[MentorshipPair])
 async def list_pairs(
     mentor_id: Optional[str] = Query(None, description="Filter by mentor ID"),
-    mentee_id: Optional[str] = Query(None, description="Filter by mentee ID")
+    mentee_id: Optional[str] = Query(None, description="Filter by mentee ID"),
+    service: MentorMatchingService = Depends(get_matching_service),
 ):
     """
     Get active mentorship pairs.
@@ -523,26 +407,14 @@ async def list_pairs(
     Returns:
         List[MentorshipPair]: List of mentorship pairs
     """
-    try:
-        pairs = list(MOCK_PAIRS.values())
-        
-        if mentor_id:
-            pairs = [p for p in pairs if p["mentorId"] == mentor_id]
-        
-        if mentee_id:
-            pairs = [p for p in pairs if p["menteeId"] == mentee_id]
-        
-        return [MentorshipPair(**pair) for pair in pairs]
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
-        )
+    pairs = service.list_pairs(mentor_id=mentor_id, mentee_id=mentee_id)
+    return [MentorshipPair(**pair) for pair in pairs]
 
 
 @router.get("/statistics", response_model=MentorshipStatistics)
-async def get_statistics():
+async def get_statistics(
+    service: MentorMatchingService = Depends(get_matching_service),
+):
     """
     Get overall mentorship program statistics.
     
@@ -551,26 +423,8 @@ async def get_statistics():
     Returns:
         MentorshipStatistics: Program-wide statistics
     """
-    try:
-        total_mentors = len(MOCK_MENTORS)
-        available_mentors = len([m for m in MOCK_MENTORS if m["isAvailable"]])
-        active_pairs = len([p for p in MOCK_PAIRS.values() if p["status"] == "active"])
-        
-        return MentorshipStatistics(
-            totalActivePairs=active_pairs,
-            totalMentors=total_mentors,
-            totalMenteesSeeking=len([r for r in MOCK_REQUESTS.values() if r["status"] == "pending"]),
-            availableMentors=available_mentors,
-            averageMatchScore=85.0,
-            completionRate=0.78,
-            underservedSkills=["Data Science", "Change Management", "Public Speaking"]
-        )
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal error: {str(e)}"
-        )
+    stats = service.statistics()
+    return MentorshipStatistics(**stats)
 
 
 @router.post("/agent/chat", response_model=AgentChatResponse)

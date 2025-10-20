@@ -71,15 +71,24 @@ export interface MentorshipStatistics {
 
 // API Functions
 
+export interface FetchMentorsOptions {
+  skillArea?: string;
+  department?: string;
+  menteeId?: string;
+}
+
 export async function fetchMentors(
-  skillArea?: string,
-  department?: string
+  options: FetchMentorsOptions = {}
 ): Promise<MentorProfile[]> {
   const params = new URLSearchParams();
-  if (skillArea) params.append('skill_area', skillArea);
-  if (department) params.append('department', department);
-  
-  const url = `${API_BASE_URL}/api/v1/mentoring/mentors?${params}`;
+  if (options.skillArea) params.append('skill_area', options.skillArea);
+  if (options.department) params.append('department', options.department);
+  if (options.menteeId) params.append('mentee_id', options.menteeId);
+
+  const query = params.toString();
+  const url = query
+    ? `${API_BASE_URL}/api/v1/mentoring/mentors?${query}`
+    : `${API_BASE_URL}/api/v1/mentoring/mentors`;
   const response = await fetch(url);
   
   if (!response.ok) {
@@ -223,4 +232,22 @@ export async function fetchMentorshipStatistics(): Promise<MentorshipStatistics>
   }
   
   return response.json();
+}
+
+export async function deleteMentorshipRequest(
+  requestId: string,
+  menteeId: string
+): Promise<void> {
+  const params = new URLSearchParams();
+  params.append('mentee_id', menteeId);
+
+  const url = `${API_BASE_URL}/api/v1/mentoring/requests/${requestId}?${params}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || 'Failed to delete mentorship request');
+  }
 }

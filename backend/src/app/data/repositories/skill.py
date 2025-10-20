@@ -41,3 +41,16 @@ class SkillRepository(BaseRepository):
         """Delete a skill by ID."""
         query = f"DELETE FROM {self.TABLE} WHERE {self.ID_FIELD} = ?"
         self.execute(query, (skill_id,))
+
+    def map_skill_ids_to_names(self, skill_ids: List[str]) -> Dict[str, str]:
+        """Return mapping of skill IDs to readable names."""
+        if not skill_ids:
+            return {}
+
+        placeholders = ",".join(["?"] * len(skill_ids))
+        query = f"SELECT id, name FROM {self.TABLE} WHERE id IN ({placeholders})"
+
+        cur = self.conn.cursor()
+        cur.execute(query, skill_ids)
+        rows = cur.fetchall()
+        return {row["id"]: row["name"] for row in rows}

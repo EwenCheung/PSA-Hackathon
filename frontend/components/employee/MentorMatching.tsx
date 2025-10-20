@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -11,6 +11,21 @@ import {
   CheckCircle, Award, TrendingUp, Search, UserCheck,
   Clock, ThumbsUp, ThumbsDown, Calendar
 } from 'lucide-react';
+
+import {
+  createMentorshipRequest,
+  fetchMentorById,
+  fetchMentors as fetchMentorsApi,
+  fetchMentorshipPairs as fetchMentorshipPairsApi,
+  fetchMentorshipRequests as fetchMentorshipRequestsApi,
+  getMentorRecommendations,
+  MentorProfile as ApiMentorProfile,
+  MentorshipPair as ApiMentorshipPair,
+  MentorshipRequest as ApiMentorshipRequest,
+  MentorRecommendation,
+  updateMentorshipRequest,
+  deleteMentorshipRequest,
+} from '../../services/mentoringService';
 
 interface MentorMatchingProps {
   employeeId: string;
@@ -32,17 +47,22 @@ interface Mentor {
   available: boolean;
   bio: string;
   achievements: string[];
+  matchScore?: number;
+  matchReason?: string;
 }
 
-interface MentorshipRequest {
+interface MentorshipRequestEntry {
   id: string;
   menteeId: string;
   menteeName: string;
   menteeRole: string;
+  mentorId: string;
+  mentorName: string;
   message: string;
   goals: string[];
   requestedDate: string;
   status: 'pending' | 'accepted' | 'declined';
+  respondedAt?: string | null;
 }
 
 interface ActiveMentee {
@@ -56,57 +76,6 @@ interface ActiveMentee {
   nextMeeting: string;
 }
 
-const availableMentors: Mentor[] = [
-  {
-    id: 'MENT001',
-    name: 'Sarah Chen',
-    role: 'Senior Product Manager',
-    department: 'Product',
-    expertise: ['Product Strategy', 'Stakeholder Management', 'Agile', 'Data Analysis'],
-    rating: 4.9,
-    totalMentees: 8,
-    available: true,
-    bio: 'Passionate about developing future product leaders. 10+ years in product management.',
-    achievements: ['Led 3 successful product launches', 'Mentored 8 PMs to senior roles'],
-  },
-  {
-    id: 'MENT002',
-    name: 'David Lee',
-    role: 'Principal Engineer',
-    department: 'Engineering',
-    expertise: ['System Design', 'Cloud Architecture', 'Leadership', 'Code Review'],
-    rating: 4.8,
-    totalMentees: 12,
-    available: true,
-    bio: 'Focused on helping engineers grow their technical and leadership skills.',
-    achievements: ['Architected core platform', 'Promoted 5 engineers to senior level'],
-  },
-  {
-    id: 'MENT003',
-    name: 'Maria Garcia',
-    role: 'Design Lead',
-    department: 'Design',
-    expertise: ['UX Design', 'Design Systems', 'User Research', 'Team Leadership'],
-    rating: 5.0,
-    totalMentees: 6,
-    available: false,
-    bio: 'Advocate for user-centered design and mentoring emerging design talent.',
-    achievements: ['Built design system', 'Won 2 design awards'],
-  },
-  {
-    id: 'MENT004',
-    name: 'James Wilson',
-    role: 'Engineering Manager',
-    department: 'Engineering',
-    expertise: ['Technical Leadership', 'Career Development', 'Team Management', 'Performance'],
-    rating: 4.7,
-    totalMentees: 10,
-    available: true,
-    bio: 'Helping engineers transition into leadership roles and achieve their career goals.',
-    achievements: ['Grew team from 5 to 20', 'Mentored 4 new managers'],
-  },
-];
-
 const goalCategories = [
   { id: 'technical', label: 'Technical Skills', icon: BookOpen },
   { id: 'leadership', label: 'Leadership', icon: Users },
@@ -114,54 +83,43 @@ const goalCategories = [
   { id: 'communication', label: 'Communication', icon: MessageSquare },
 ];
 
-// Mock data - employee is also a mentor
-const isMentor = true;
+const mapMentorProfile = (profile: ApiMentorProfile): Mentor => ({
+  id: profile.employeeId,
+  name: profile.name,
+  role: profile.role,
+  department: profile.department,
+  expertise: profile.expertiseAreas,
+  rating: profile.rating,
+  totalMentees: profile.menteesCount,
+  available: profile.isAvailable,
+  bio: profile.bio,
+  achievements: profile.achievements,
+});
 
-const mockPendingRequests: MentorshipRequest[] = [
-  {
-    id: 'REQ001',
-    menteeId: 'EMP010',
-    menteeName: 'John Smith',
-    menteeRole: 'Junior Developer',
-    message: 'Hi! I\'m looking to improve my system design skills and leadership abilities. I\'ve been following your work and would love to learn from your experience.',
-    goals: ['Technical Skills', 'System Design', 'Leadership'],
-    requestedDate: '2025-10-15',
-    status: 'pending',
-  },
-  {
-    id: 'REQ002',
-    menteeId: 'EMP011',
-    menteeName: 'Emily Chen',
-    menteeRole: 'Software Developer',
-    message: 'I\'m transitioning to a senior role and need guidance on technical leadership and code reviews. Your expertise would be invaluable.',
-    goals: ['Leadership', 'Career Growth', 'Code Review'],
-    requestedDate: '2025-10-16',
-    status: 'pending',
-  },
-];
+const mapMentorshipRequest = (request: ApiMentorshipRequest): MentorshipRequestEntry => ({
+  id: request.requestId,
+  menteeId: request.menteeId,
+  menteeName: request.menteeName,
+  menteeRole: request.menteeRole,
+  mentorId: request.mentorId,
+  mentorName: request.mentorName,
+  message: request.message,
+  goals: request.goals,
+  requestedDate: request.createdAt ?? new Date().toISOString(),
+  status: request.status,
+  respondedAt: request.respondedAt,
+});
 
-const mockActiveMentees: ActiveMentee[] = [
-  {
-    id: 'EMP012',
-    name: 'Sarah Martinez',
-    role: 'Mid-level Developer',
-    startDate: '2025-08-01',
-    goals: ['System Architecture', 'Technical Leadership', 'Career Growth'],
-    progress: 65,
-    lastMeeting: '2025-10-10',
-    nextMeeting: '2025-10-24',
-  },
-  {
-    id: 'EMP013',
-    name: 'Michael Wong',
-    role: 'Senior Developer',
-    startDate: '2025-07-15',
-    goals: ['Team Management', 'Stakeholder Communication'],
-    progress: 80,
-    lastMeeting: '2025-10-12',
-    nextMeeting: '2025-10-26',
-  },
-];
+const mapMentorshipPair = (pair: ApiMentorshipPair): ActiveMentee => ({
+  id: pair.menteeId,
+  name: pair.menteeName,
+  role: pair.menteeRole,
+  startDate: pair.startDate ?? new Date().toISOString().split('T')[0],
+  goals: pair.focusAreas ?? [],
+  progress: pair.progressPercentage ?? 0,
+  lastMeeting: pair.lastMeetingDate ?? 'Not recorded',
+  nextMeeting: pair.nextMeetingDate ?? 'To be scheduled',
+});
 
 export default function MentorMatching({ employeeId, employeeData }: MentorMatchingProps) {
   const [viewMode, setViewMode] = useState<'find' | 'manage'>('find');
@@ -172,8 +130,121 @@ export default function MentorMatching({ employeeId, employeeData }: MentorMatch
   const [requestMessage, setRequestMessage] = useState('');
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
-  const [requests, setRequests] = useState<MentorshipRequest[]>(mockPendingRequests);
-  const [mentees, setMentees] = useState<ActiveMentee[]>(mockActiveMentees);
+  const [availableMentors, setAvailableMentors] = useState<Mentor[]>([]);
+  const [mentorRequests, setMentorRequests] = useState<MentorshipRequestEntry[]>([]);
+  const [menteeRequests, setMenteeRequests] = useState<MentorshipRequestEntry[]>([]);
+  const [mentees, setMentees] = useState<ActiveMentee[]>([]);
+  const [recommendations, setRecommendations] = useState<MentorRecommendation[]>([]);
+  const [isMentor, setIsMentor] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deletingRequestIds, setDeletingRequestIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [mentorProfiles, mentorRequestData, menteeRequestData, mentorPairsData] = await Promise.all([
+          fetchMentorsApi({ menteeId: employeeId }),
+          fetchMentorshipRequestsApi(employeeId, undefined),
+          fetchMentorshipRequestsApi(undefined, employeeId),
+          fetchMentorshipPairsApi(employeeId, undefined),
+        ]);
+
+        if (cancelled) {
+          return;
+        }
+
+        setAvailableMentors(mentorProfiles.map(mapMentorProfile));
+        setMentorRequests(mentorRequestData.map(mapMentorshipRequest));
+        setMenteeRequests(menteeRequestData.map(mapMentorshipRequest));
+        setMentees(mentorPairsData.map(mapMentorshipPair));
+      } catch (err) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message : 'Failed to load mentoring data';
+          setError(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    const determineMentorStatus = async () => {
+      try {
+        await fetchMentorById(employeeId);
+        if (!cancelled) {
+          setIsMentor(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsMentor(false);
+        }
+      }
+    };
+
+    loadData();
+    determineMentorStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [employeeId]);
+
+  const refreshMentorData = async () => {
+    try {
+      const [mentorRequestData, menteeRequestData, mentorPairsData, mentorProfiles] = await Promise.all([
+        fetchMentorshipRequestsApi(employeeId, undefined),
+        fetchMentorshipRequestsApi(undefined, employeeId),
+        fetchMentorshipPairsApi(employeeId, undefined),
+        fetchMentorsApi({ menteeId: employeeId }),
+      ]);
+
+      setMentorRequests(mentorRequestData.map(mapMentorshipRequest));
+      setMenteeRequests(menteeRequestData.map(mapMentorshipRequest));
+      setMentees(mentorPairsData.map(mapMentorshipPair));
+      setAvailableMentors(mentorProfiles.map(mapMentorProfile));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to refresh mentoring data';
+      setError(message);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedGoals.length === 0) {
+      setRecommendations([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadRecommendations = async () => {
+      try {
+        const recs = await getMentorRecommendations(
+          employeeId,
+          selectedGoals,
+          selectedGoals,
+        );
+        if (!cancelled) {
+          setRecommendations(recs);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to fetch mentor recommendations', err);
+        }
+      }
+    };
+
+    loadRecommendations();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [employeeId, selectedGoals]);
 
   const handleGoalToggle = (goal: string) => {
     setSelectedGoals(prev =>
@@ -194,66 +265,110 @@ export default function MentorMatching({ employeeId, employeeData }: MentorMatch
     setSelectedMentor(mentorId);
     setShowRequestForm(true);
     setRequestSent(false);
+    setError(null);
   };
 
-  const handleSubmitRequest = () => {
-    if (selectedMentor && requestMessage.trim()) {
+  const handleSubmitRequest = async () => {
+    if (!selectedMentor || !requestMessage.trim()) {
+      return;
+    }
+
+    try {
+      const created = await createMentorshipRequest(
+        employeeId,
+        selectedMentor,
+        requestMessage.trim(),
+        selectedGoals,
+      );
+      setMenteeRequests(prev => {
+        const withoutDuplicate = prev.filter(request => request.id !== created.requestId);
+        return [mapMentorshipRequest(created), ...withoutDuplicate];
+      });
+      await refreshMentorData();
       setRequestSent(true);
-      setTimeout(() => {
-        setShowRequestForm(false);
-        setRequestMessage('');
-        setSelectedMentor(null);
-      }, 2000);
+      setShowRequestForm(false);
+      setRequestMessage('');
+      setSelectedMentor(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send mentorship request';
+      setError(message);
     }
   };
 
-  const handleAcceptRequest = (requestId: string) => {
-    setRequests(prev =>
-      prev.map(req =>
-        req.id === requestId ? { ...req, status: 'accepted' as const } : req
-      )
-    );
-    const acceptedRequest = requests.find(req => req.id === requestId);
-    if (acceptedRequest) {
-      const newMentee: ActiveMentee = {
-        id: acceptedRequest.menteeId,
-        name: acceptedRequest.menteeName,
-        role: acceptedRequest.menteeRole,
-        startDate: new Date().toISOString().split('T')[0],
-        goals: acceptedRequest.goals,
-        progress: 0,
-        lastMeeting: 'Not scheduled',
-        nextMeeting: 'To be scheduled',
-      };
-      setMentees(prev => [...prev, newMentee]);
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      await updateMentorshipRequest(requestId, 'accepted');
+      await refreshMentorData();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to accept mentorship request';
+      setError(message);
     }
   };
 
-  const handleDeclineRequest = (requestId: string) => {
-    setRequests(prev =>
-      prev.map(req =>
-        req.id === requestId ? { ...req, status: 'declined' as const } : req
-      )
-    );
+  const handleDeclineRequest = async (requestId: string) => {
+    try {
+      await updateMentorshipRequest(requestId, 'declined');
+      await refreshMentorData();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to decline mentorship request';
+      setError(message);
+    }
   };
 
-  const filteredMentors = availableMentors.filter(mentor =>
-    mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mentor.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mentor.expertise.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+  const handleDeleteRequest = async (requestId: string) => {
+    if (deletingRequestIds.has(requestId)) {
+      return;
+    }
+
+    setDeletingRequestIds(prev => new Set(prev).add(requestId));
+    try {
+      await deleteMentorshipRequest(requestId, employeeId);
+      await refreshMentorData();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete mentorship request';
+      setError(message);
+    } finally {
+      setDeletingRequestIds(prev => {
+        const next = new Set(prev);
+        next.delete(requestId);
+        return next;
+      });
+    }
+  };
+
+  const availableMentorCount = useMemo(
+    () => availableMentors.filter(mentor => mentor.available).length,
+    [availableMentors]
   );
 
-  const recommendedMentors = availableMentors
-    .filter(mentor => 
-      mentor.available && 
-      (mentor.department === employeeData.department || 
-       mentor.expertise.some(skill => 
-         selectedGoals.some(goal => 
-           goal.toLowerCase().includes(skill.toLowerCase())
-         )
-       ))
-    )
-    .slice(0, 3);
+  const filteredMentors = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) {
+      return availableMentors;
+    }
+
+    return availableMentors.filter(mentor =>
+      mentor.name.toLowerCase().includes(term) ||
+      mentor.role.toLowerCase().includes(term) ||
+      mentor.expertise.some(skill => skill.toLowerCase().includes(term))
+    );
+  }, [availableMentors, searchTerm]);
+
+  const recommendedMentors = useMemo(() => (
+    recommendations
+      .map(recommendation => {
+        const mentor = availableMentors.find(m => m.id === recommendation.mentorId);
+        if (!mentor) {
+          return null;
+        }
+        return {
+          ...mentor,
+          matchScore: recommendation.matchScore,
+          matchReason: recommendation.reason,
+        };
+      })
+      .filter((mentor): mentor is Mentor => mentor !== null)
+  ), [availableMentors, recommendations]);
 
   return (
     <div className="space-y-6">
@@ -272,9 +387,15 @@ export default function MentorMatching({ employeeId, employeeData }: MentorMatch
         </div>
         <Badge variant="secondary" className="text-lg px-4 py-2">
           <Users className="w-4 h-4 mr-2" />
-          {availableMentors.filter(m => m.available).length} Available Mentors
+          {loading ? 'Loading mentors…' : `${availableMentorCount} Available Mentors`}
         </Badge>
       </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Success Alert */}
       {requestSent && (
@@ -313,11 +434,16 @@ export default function MentorMatching({ employeeId, employeeData }: MentorMatch
               recommendedMentors={recommendedMentors}
               filteredMentors={filteredMentors}
             />
+            <ApplicationHistory 
+              requests={menteeRequests}
+              onDelete={handleDeleteRequest}
+              deletingIds={deletingRequestIds}
+            />
           </TabsContent>
 
           <TabsContent value="manage" className="space-y-6">
             <ManageMenteesView 
-              requests={requests}
+              requests={mentorRequests}
               mentees={mentees}
               handleAcceptRequest={handleAcceptRequest}
               handleDeclineRequest={handleDeclineRequest}
@@ -325,18 +451,25 @@ export default function MentorMatching({ employeeId, employeeData }: MentorMatch
           </TabsContent>
         </Tabs>
       ) : (
-        <FindMentorView 
-          selectedGoals={selectedGoals}
-          customGoal={customGoal}
-          searchTerm={searchTerm}
-          setCustomGoal={setCustomGoal}
-          setSearchTerm={setSearchTerm}
-          handleGoalToggle={handleGoalToggle}
-          handleAddCustomGoal={handleAddCustomGoal}
-          handleRequestMentorship={handleRequestMentorship}
-          recommendedMentors={recommendedMentors}
-          filteredMentors={filteredMentors}
-        />
+        <>
+          <FindMentorView 
+            selectedGoals={selectedGoals}
+            customGoal={customGoal}
+            searchTerm={searchTerm}
+            setCustomGoal={setCustomGoal}
+            setSearchTerm={setSearchTerm}
+            handleGoalToggle={handleGoalToggle}
+            handleAddCustomGoal={handleAddCustomGoal}
+            handleRequestMentorship={handleRequestMentorship}
+            recommendedMentors={recommendedMentors}
+            filteredMentors={filteredMentors}
+          />
+          <ApplicationHistory 
+            requests={menteeRequests}
+            onDelete={handleDeleteRequest}
+            deletingIds={deletingRequestIds}
+          />
+        </>
       )}
 
       {/* Request Form Modal */}
@@ -501,9 +634,17 @@ function FindMentorView({
                       {mentor.rating}
                     </Badge>
                   </div>
+                  {mentor.matchScore !== undefined && (
+                    <Badge variant="outline" className="mt-2 text-xs">
+                      Match {mentor.matchScore}%
+                    </Badge>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-sm text-muted-foreground line-clamp-2">{mentor.bio}</p>
+                  {mentor.matchReason && (
+                    <p className="text-xs text-muted-foreground">{mentor.matchReason}</p>
+                  )}
                   <div className="flex flex-wrap gap-1">
                     {mentor.expertise.slice(0, 3).map(skill => (
                       <Badge key={skill} variant="secondary" className="text-xs">
@@ -603,10 +744,10 @@ function FindMentorView({
 }
 
 interface ManageMenteesViewProps {
-  requests: MentorshipRequest[];
+  requests: MentorshipRequestEntry[];
   mentees: ActiveMentee[];
-  handleAcceptRequest: (requestId: string) => void;
-  handleDeclineRequest: (requestId: string) => void;
+  handleAcceptRequest: (requestId: string) => Promise<void> | void;
+  handleDeclineRequest: (requestId: string) => Promise<void> | void;
 }
 
 function ManageMenteesView({
@@ -686,7 +827,7 @@ function ManageMenteesView({
                   <div className="flex gap-2">
                     <Button 
                       className="flex-1"
-                      onClick={() => handleAcceptRequest(request.id)}
+                      onClick={() => void handleAcceptRequest(request.id)}
                     >
                       <ThumbsUp className="w-4 h-4 mr-2" />
                       Accept
@@ -694,7 +835,7 @@ function ManageMenteesView({
                     <Button 
                       variant="outline"
                       className="flex-1"
-                      onClick={() => handleDeclineRequest(request.id)}
+                      onClick={() => void handleDeclineRequest(request.id)}
                     >
                       <ThumbsDown className="w-4 h-4 mr-2" />
                       Decline
@@ -791,5 +932,85 @@ function ManageMenteesView({
         </div>
       )}
     </>
+  );
+}
+
+interface ApplicationHistoryProps {
+  requests: MentorshipRequestEntry[];
+  onDelete?: (requestId: string) => void;
+  deletingIds?: Set<string>;
+}
+
+function ApplicationHistory({ requests, onDelete, deletingIds }: ApplicationHistoryProps) {
+  const canDelete = Boolean(onDelete);
+  return (
+    <Card className="mt-6">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Clock className="w-5 h-5" />
+          Application History
+        </CardTitle>
+        <CardDescription>Track the status of mentorship requests you have submitted.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {requests.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No mentorship requests yet. Find a mentor above to get started.</p>
+        ) : (
+          <div className="space-y-4">
+            {requests.map(request => (
+              <Card key={request.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{request.mentorName}</CardTitle>
+                      <CardDescription>Requested on {new Date(request.requestedDate).toLocaleDateString()}</CardDescription>
+                    </div>
+                    <Badge variant={request.status === 'accepted' ? 'default' : request.status === 'pending' ? 'secondary' : 'outline'}>
+                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Goals</p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {request.goals.map(goal => (
+                        <Badge key={goal} variant="secondary">{goal}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Message</p>
+                    <p className="text-sm">{request.message}</p>
+                  </div>
+                  {request.respondedAt && (
+                    <p className="text-xs text-muted-foreground">
+                      Responded {new Date(request.respondedAt).toLocaleString()}
+                    </p>
+                  )}
+                  {request.status === 'accepted' && (
+                    <p className="text-xs text-muted-foreground">
+                      This mentorship has been accepted. You can manage sessions with your mentor.
+                    </p>
+                  )}
+                  {canDelete && request.status !== 'accepted' && (
+                    <div className="pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onDelete?.(request.id)}
+                        disabled={deletingIds?.has(request.id)}
+                      >
+                        {request.status === 'pending' ? 'Cancel Request' : 'Remove from History'}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

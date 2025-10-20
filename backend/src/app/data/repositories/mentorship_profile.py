@@ -40,6 +40,7 @@ class MentorshipProfileRepository(BaseRepository):
                 e.role,
                 e.department_id,
                 e.level,
+                e.position_level,
                 e.skills_map,
                 e.hire_date
             FROM mentorship_profiles mp
@@ -76,3 +77,15 @@ class MentorshipProfileRepository(BaseRepository):
             Dictionary with capacity, mentees_count, rating, or None if not found
         """
         return self.get_profile(mentor_id)
+
+    def increment_mentees_count(self, mentor_id: str, delta: int = 1) -> None:
+        cur = self.conn.cursor()
+        cur.execute(
+            """
+            UPDATE mentorship_profiles
+            SET mentees_count = mentees_count + ?
+            WHERE employee_id = ?
+            """,
+            (delta, mentor_id),
+        )
+        self.conn.commit()
