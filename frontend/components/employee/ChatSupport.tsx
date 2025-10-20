@@ -212,7 +212,7 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
       <Card className="border border-[#D0E8F5]">
         <CardHeader className="border-b border-[#E8F3F9]">
           <div className="flex items-center justify-between">
-            <div>
+            <div className='pb-4'>
               <CardTitle className="flex items-center gap-2">
                 <Heart className="w-5 h-5 text-[#4167B1]" />
                 Wellbeing Support Chat
@@ -345,15 +345,7 @@ export default function ChatSupport({ employeeId }: ChatSupportProps) {
         <CardContent className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
             <MessageCircle className="w-4 h-4 text-[#4167B1]" />
-            <span>HR Support: hr@company.com</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Heart className="w-4 h-4 text-red-600" />
-            <span>Employee Assistance Program: 1-800-XXX-XXXX</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <AlertCircle className="w-4 h-4 text-yellow-600" />
-            <span>Crisis Support: Available 24/7</span>
+            <span>HR Support: psac_hr@globalpsa.com</span>
           </div>
         </CardContent>
       </Card>
