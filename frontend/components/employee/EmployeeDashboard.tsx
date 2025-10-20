@@ -1,31 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
-import { LogOut, GraduationCap, MessageCircle, ShoppingBag, User, Users } from 'lucide-react';
+import { LogOut, GraduationCap, MessageCircle, ShoppingBag, Users, User } from 'lucide-react';
 import CareerPath from './CareerPath';
 import ChatSupport from './ChatSupport';
 import Marketplace from './Marketplace';
-import MentorMatching from './MentorMatching';
+import MentorshipHub from './MentorshipHub';
 import { Badge } from '../ui/badge';
+import type { EmployeeProfile, EmployeeSession } from '../../src/types/employee';
 
 interface EmployeeDashboardProps {
-  employeeId: string;
+  employee: EmployeeProfile;
+  session: EmployeeSession;
   onLogout: () => void;
 }
 
-// Mock employee data
-const mockEmployeeData = {
-  name: 'Alex Johnson',
-  role: 'Software Developer',
-  department: 'Engineering',
-  points: 1250,
-  level: 'Mid-Level',
-  joinDate: '2023-01-15',
-};
-
-export default function EmployeeDashboard({ employeeId, onLogout }: EmployeeDashboardProps) {
+export default function EmployeeDashboard({ employee, session, onLogout }: EmployeeDashboardProps) {
   const [currentTab, setCurrentTab] = useState('career');
-  const [points, setPoints] = useState(mockEmployeeData.points);
+  const [points, setPoints] = useState(employee.points_current);
+
+  useEffect(() => {
+    setPoints(employee.points_current);
+  }, [employee.points_current]);
 
   const handlePointsUpdate = (newPoints: number) => {
     setPoints(newPoints);
@@ -37,14 +33,18 @@ export default function EmployeeDashboard({ employeeId, onLogout }: EmployeeDash
       <header className="bg-card border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-[#4167B1] rounded-full flex items-center justify-center">
                 <User className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl">{mockEmployeeData.name}</h1>
+                <h1 className="text-xl">{employee.name}</h1>
                 <p className="text-sm text-gray-600">
-                  {mockEmployeeData.role} • ID: {employeeId}
+                  {employee.role ?? 'Employee'} • Level {employee.position_level ?? '—'}
+                </p>
+                <p className="text-xs text-muted-foreground">ID: {employee.id}</p>
+                <p className="text-xs text-muted-foreground">
+                  Session issued {new Date(session.issued_at).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -72,13 +72,13 @@ export default function EmployeeDashboard({ employeeId, onLogout }: EmployeeDash
               <GraduationCap className="w-4 h-4" />
               Career Path
             </TabsTrigger>
-            <TabsTrigger value="mentor" className="gap-2">
-              <Users className="w-4 h-4" />
-              Mentor Matching
-            </TabsTrigger>
             <TabsTrigger value="wellbeing" className="gap-2">
               <MessageCircle className="w-4 h-4" />
               Wellbeing Support
+            </TabsTrigger>
+            <TabsTrigger value="mentorship" className="gap-2">
+              <Users className="w-4 h-4" />
+              Mentorship Hub
             </TabsTrigger>
             <TabsTrigger value="marketplace" className="gap-2">
               <ShoppingBag className="w-4 h-4" />
@@ -88,22 +88,19 @@ export default function EmployeeDashboard({ employeeId, onLogout }: EmployeeDash
 
           <TabsContent value="career">
             <CareerPath 
-              employeeId={employeeId} 
-              employeeData={mockEmployeeData}
+              employeeId={employee.id} 
+              profile={employee}
               points={points}
               onPointsUpdate={handlePointsUpdate}
             />
           </TabsContent>
 
-          <TabsContent value="mentor">
-            <MentorMatching 
-              employeeId={employeeId} 
-              employeeData={mockEmployeeData}
-            />
+          <TabsContent value="wellbeing">
+            <ChatSupport employeeId={employee.id} />
           </TabsContent>
 
-          <TabsContent value="wellbeing">
-            <ChatSupport employeeId={employeeId} />
+          <TabsContent value="mentorship">
+            <MentorshipHub employee={employee} />
           </TabsContent>
 
           <TabsContent value="marketplace">

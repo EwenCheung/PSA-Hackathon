@@ -10,6 +10,15 @@ Usage
 import os
 from dataclasses import dataclass
 
+from dotenv import load_dotenv
+
+
+def _load_environment_file() -> None:
+    load_dotenv(override=False)
+
+
+_load_environment_file()
+
 
 @dataclass
 class Settings:
@@ -19,4 +28,3 @@ class Settings:
 
 
 settings = Settings()
-

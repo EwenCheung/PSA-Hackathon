@@ -214,3 +214,198 @@ export default function Marketplace({ points, onPointsUpdate }: MarketplaceProps
     </div>
   );
 }
+
+// import { useState, useEffect } from 'react';
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+// import { Button } from '../ui/button';
+// import { Badge } from '../ui/badge';
+// import { 
+//   Gift, Coffee, Book, Ticket, 
+//   Smartphone, Award, ShoppingCart, CheckCircle2 
+// } from 'lucide-react';
+// import { Alert, AlertDescription } from '../ui/alert';
+
+// interface MarketplaceItem {
+//   id: number;
+//   name: string;
+//   description: string;
+//   points: number;
+//   category: string;
+//   in_stock: boolean;
+// }
+
+// export default function Marketplace() {
+//   const [points, setPoints] = useState<number>(0);
+//   const [items, setItems] = useState<MarketplaceItem[]>([]);
+//   const [recentPurchase, setRecentPurchase] = useState<string | null>(null);
+//   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+//   // Map category name to icon (fallback to Gift)
+//   const iconMap: Record<string, any> = {
+//     'Food & Beverage': Coffee,
+//     'Food & Drink': Coffee,
+//     'Learning': Book,
+//     'Entertainment': Ticket,
+//     'Time Off': Gift,
+//     'Technology': Smartphone,
+//     'Career': Award
+//   };
+
+//   const categories = ['All', ...Array.from(new Set(items.map(item => item.category)))];
+
+//   // Fetch user points
+//   const fetchPoints = async () => {
+//     try {
+//       const res = await fetch('/api/user/points');
+//       const data = await res.json();
+//       setPoints(data.points);
+//     } catch (err) {
+//       console.error('Failed to fetch points', err);
+//     }
+//   };
+
+//   // Fetch marketplace items and map fields
+//   const fetchItems = async () => {
+//     try {
+//       const res = await fetch('/api/marketplace/items');
+//       const data = await res.json();
+//       const mapped: MarketplaceItem[] = data.map((item: any) => ({
+//         id: item.id,
+//         name: item.name,
+//         description: item.description,
+//         points: item.points_cost,       // map points_cost -> points
+//         category: item.category,
+//         in_stock: Boolean(item.in_stock)
+//       }));
+//       setItems(mapped);
+//     } catch (err) {
+//       console.error('Failed to fetch marketplace items', err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchPoints();
+//     fetchItems();
+//   }, []);
+
+//   // Redeem an item
+//   const handleRedeem = async (item: MarketplaceItem) => {
+//     if (points < item.points || !item.in_stock) return;
+
+//     try {
+//       const res = await fetch('/api/purchase/redeem', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ item_id: item.id }),
+//       });
+//       const data = await res.json();
+//       if (data.success) {
+//         setPoints(points - item.points);
+//         setRecentPurchase(item.name);
+//         setTimeout(() => setRecentPurchase(null), 5000);
+//         // Optionally refetch items to update stock
+//         fetchItems();
+//       } else {
+//         alert(data.message || 'Failed to redeem item');
+//       }
+//     } catch (err) {
+//       console.error('Redeem failed', err);
+//       alert('Failed to redeem item');
+//     }
+//   };
+
+//   const filteredItems = selectedCategory === 'All'
+//     ? items
+//     : items.filter(i => i.category === selectedCategory);
+
+//   return (
+//     <div className="max-w-6xl mx-auto space-y-6">
+//       {/* Header */}
+//       <Card className="border border-[#D0E8F5]">
+//         <CardHeader className="border-b border-[#E8F3F9]">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <CardTitle className="flex items-center gap-2">
+//                 <ShoppingCart className="w-5 h-5 text-[#4167B1]" />
+//                 Rewards Marketplace
+//               </CardTitle>
+//               <CardDescription>
+//                 Redeem your earned points for exciting rewards
+//               </CardDescription>
+//             </div>
+//             <div className="text-right">
+//               <p className="text-sm text-gray-600">Available Points</p>
+//               <p className="text-3xl">{points}</p>
+//             </div>
+//           </div>
+//         </CardHeader>
+//       </Card>
+
+//       {/* Recent Purchase Alert */}
+//       {recentPurchase && (
+//         <Alert className="border-green-500/20 bg-green-50">
+//           <CheckCircle2 className="w-4 h-4 text-green-600" />
+//           <AlertDescription>
+//             <strong>Success!</strong> You've redeemed {recentPurchase}.
+//           </AlertDescription>
+//         </Alert>
+//       )}
+
+//       {/* Category Filter */}
+//       <div className="flex gap-2 flex-wrap">
+//         {categories.map(cat => (
+//           <Button
+//             key={cat}
+//             variant={selectedCategory === cat ? 'default' : 'outline'}
+//             size="sm"
+//             onClick={() => setSelectedCategory(cat)}
+//           >
+//             {cat}
+//           </Button>
+//         ))}
+//       </div>
+
+//       {/* Items Grid */}
+//       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {filteredItems.map(item => {
+//           const Icon = iconMap[item.category] || Gift;
+//           const canAfford = points >= item.points;
+
+//           return (
+//             <Card key={item.id} className={`border border-[#D0E8F5] ${!canAfford || !item.in_stock ? 'opacity-60' : ''}`}>
+//               <CardHeader>
+//                 <div className="flex items-start justify-between">
+//                   <div className="w-12 h-12 bg-[#DEF0F9] rounded-lg flex items-center justify-center mb-3">
+//                     <Icon className="w-6 h-6 text-[#4167B1]" />
+//                   </div>
+//                   <Badge variant="secondary">{item.category}</Badge>
+//                 </div>
+//                 <CardTitle className="text-base">{item.name}</CardTitle>
+//                 <CardDescription>{item.description}</CardDescription>
+//               </CardHeader>
+//               <CardContent>
+//                 <div className="space-y-4">
+//                   <div className="flex items-center justify-between">
+//                     <div className="flex items-center gap-2">
+//                       <Award className="w-5 h-5 text-yellow-600" />
+//                       <span className="text-xl">{item.points} pts</span>
+//                     </div>
+//                     {item.in_stock && <Badge variant="outline" className="text-green-600">In Stock</Badge>}
+//                   </div>
+
+//                   <Button
+//                     className="w-full"
+//                     disabled={!canAfford || !item.in_stock}
+//                     onClick={() => handleRedeem(item)}
+//                   >
+//                     {!canAfford ? `Need ${item.points - points} more pts` : 'Redeem Now'}
+//                   </Button>
+//                 </div>
+//               </CardContent>
+//             </Card>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// }
