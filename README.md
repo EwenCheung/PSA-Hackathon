@@ -1,5 +1,4 @@
-# PSA-Hackathon
-
+# PSA-Hackathon (PathForger)
 Short repo README to onboard developers quickly. Contains frontend and backend run instructions, data locations, and agent/embeddings notes.
 
 ## Project overview
