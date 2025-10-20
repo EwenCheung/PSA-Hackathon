@@ -1,18 +1,30 @@
-# PSA Hackathon (PathForger)
-Monorepo containing a FastAPI backend and a Vite/React frontend for the PSA Hackathon prototype. Use the automation in `Prototype_ThreeMusketeer/` to spin up both services consistently.
+# PathForger - PSA Hackathon Solution
 
-## Quick start
-- `Prototype_ThreeMusketeer/start_server.sh` orchestrates the full stack. Run with `--dry-run` first if you want to preview the commands.
-- The launcher performs:
-  1. Navigate to `backend/`, run `uv sync`, activate `.venv`, and launch `uvicorn app.main:app --reload` on port 8000.
-  2. Navigate to `frontend/`, run `npm install`, and start `npm run dev` (Vite on port 5173).
-- On errors the script reminds you to shut down conflicting servers (FastAPI or Vite) before retrying.
+## Problem Statement
+**Future-Ready Workforce – AI for Employee Growth and Engagement**
 
+PSA faces challenges in managing employee career development amid rapid technological transformation. The need for personalized growth support, mental well-being resources, and equitable opportunities across diverse employee groups requires an AI-driven solution.
+
+## Objective
+Develop an AI-powered platform that:
+- **Personalizes Career Development**: Recommends career pathways, internal mobility, and upskilling plans
+- **Provides Intelligent Support**: Conversational AI for engagement, well-being, and continuous development
+- **Predicts Leadership Potential**: Uses behavioral, performance, and engagement data analytics
+- **Enables Inclusive Growth**: Targeted mentorship, accessibility, and recognition systems for multi-generational workforce
+
+## Solution Overview
+PathForger is an AI-powered growth platform that helps employees build leadership potential while providing employers real-time workforce readiness insights through modular AI agents and vector-based intelligence.
+
+## Quick Start
 ```bash
 cd Prototype_ThreeMusketeer
-bash start_server.sh             # start both servers (Ctrl+C stops them)
-bash start_server.sh --dry-run   # preview commands only
+bash start_server.sh             # Start both servers (Ctrl+C to stop)
+bash start_server.sh --dry-run   # Preview commands only
 ```
+
+The launcher automatically:
+1. Sets up FastAPI backend (Python 3.10+, uv tool) on port 8000
+2. Starts React/Vite frontend on port 5173
 
 ### Manual startup (alternative workflow)
 If you prefer to launch services manually, follow the flow many teammates use:
@@ -35,13 +47,26 @@ If you prefer to launch services manually, follow the flow many teammates use:
 
 This path mirrors what the launcher automates, but gives you granular control over each process.
 
-## Architecture Overview
-- **Platform vision**: PathForger is an AI-powered growth platform helping employees build leadership potential while giving employers a real-time picture of workforce readiness.
-- **Modular AI agents**: The backend hosts dedicated agents for course recommendations, wellbeing analysis, leadership evaluation, and mentor matching. Each agent encapsulates prompts, policies, and data pipelines for its domain.
-- **Vector intelligence**: Skill, role, and goal data are embedded into a vector index so the recommendation agent can surface the top courses for each employee with explanations.
-- **Central data hub**: A secure SQL database stores employee profiles, skill taxonomies, engagement telemetry, and mentorship activity. Repositories in `backend/src/app/data/` abstract reads/writes.
-- **Extensibility**: The service layer is designed to plug into enterprise systems (e.g., SAP, Workday) by swapping repository adapters without touching the agent logic.
-- **Front-end shell**: React + Vite provide a responsive experience, with view modules composed so that Employee and Employer dashboards share UI primitives while presenting role-specific insights.
+## Key Features
+
+### For Employees
+- **Personalized Course Recommendations**: AI-powered course matching based on skills, goals, and career aspirations
+- **Career Path Navigation**: Short-term (0-6 months), mid-term (6-18 months), and long-term (18+ months) development roadmaps
+- **Leadership Scoring**: AI evaluation of leadership potential using learning velocity and engagement data
+- **Smart Mentorship Matching**: AI-driven mentor pairing based on expertise and compatibility
+- **Wellbeing Support**: Sentiment analysis and proactive mental health interventions
+- **Gamification**: Points system for courses, mentoring, and milestone achievements
+
+### For Employers
+- **Workforce Analytics**: Real-time insights on top performers, leadership candidates, and skill gaps
+- **Mentorship Program Management**: Oversight of mentor capacity and program effectiveness
+- **Strategic Planning Tools**: Data-driven promotion and reskilling decision support
+
+## Technology Stack
+- **Backend**: FastAPI (Python 3.10+) with modular AI agents and vector embeddings
+- **Frontend**: React + TypeScript with Vite
+- **Database**: SQLite for employee profiles and engagement data
+- **AI/ML**: Vector intelligence for recommendations and sentiment analysis
 
 ## Employee View Experience
 - **Personalised course intelligence**: Employees sign in, trigger the embeddings pipeline, and receive the top three course matches with rationale anchored to their skills, aspirations, and current role.
@@ -63,24 +88,17 @@ This path mirrors what the launcher automates, but gives you granular control ov
 - **Future-ready evolution**: The modular architecture keeps the platform adaptable, paving the way for deeper enterprise integrations, additional agents, and region-specific content.
 - **Where growth meets opportunity**: By aligning engagement, insight, and development, PathForger forges leaders while keeping teams energised for what’s next.
 
-## Backend notes
-- Code lives in `backend/src/app/` (agents, repositories, and data files under `data/`).
-- Requires Python 3.10+ and the [`uv`](https://github.com/astral-sh/uv) tool for dependency syncing. After activation, the FastAPI app is served at `http://localhost:8000`.
-- Seed JSON and the SQLite database reside under `backend/src/app/data/` (check `database/app.db`).
+## Project Structure
+```
+├── backend/               # FastAPI backend with AI agents
+├── frontend/             # React + Vite frontend
+└── Prototype_ThreeMusketeer/  # Launch automation scripts
+```
 
-## Frontend notes
-- Vite + React (TypeScript) lives in `frontend/` with shared UI primitives under `src/components/`.
-- `npm run dev` serves the UI on `http://localhost:5173` with hot reload.
+## Development Setup
+**Requirements**: Python 3.10+, Node.js, [`uv`](https://github.com/astral-sh/uv) tool
 
-## Testing & validation
-- Shell smoke tests live under `tests/`. Run `tests/test_start_server.sh` to ensure the launcher script keeps its contract intact.
-- Add Python tests under `backend/tests/` (pytest) and frontend tests under `frontend/src/__tests__/` (Vitest) as features grow.
+**Ports**: Backend (8000), Frontend (5173)
 
-## Troubleshooting
-- `uv sync` failures: ensure the `.venv` folder exists and no other Python process is locking dependencies.
-- Port conflicts: stop existing FastAPI or Vite instances (`lsof -i :8000` / `lsof -i :5173`) before re-running the launcher.
-- `npm install` permission errors often stem from global cache issues; clear `~/.npm` or retry after closing other Node processes.
-
-## Contributing guidelines
-- Keep backend and frontend changes in separate commits when practical.
-- Document new automation or setup steps in `Prototype_ThreeMusketeer/README.md` so the whole team stays aligned.
+## Team
+Three Musketeers - PSA Hackathon 2025
