@@ -22,7 +22,7 @@ const mentors = [
   {
     id: 'EMP005',
     name: 'David Lee',
-    role: 'Principal Engineer',
+    role: 'Junior Engineer',
     expertise: ['System Design', 'Cloud Architecture', 'Leadership'],
     mentees: 3,
     capacity: 3,
@@ -76,12 +76,12 @@ const mentorshipPairs = [
     mentor: {
       id: 'EMP005',
       name: 'David Lee',
-      role: 'Principal Engineer',
+      role: 'Junior Engineer',
     },
     mentee: {
       id: 'EMP012',
       name: 'Sarah Martinez',
-      role: 'Mid-level Developer',
+      role: 'Intern Software Developer',
     },
     startDate: '2025-08-01',
     focusAreas: ['System Architecture', 'Technical Leadership', 'Career Growth'],
@@ -133,12 +133,12 @@ const mentorshipPairs = [
     mentor: {
       id: 'EMP005',
       name: 'David Lee',
-      role: 'Principal Engineer',
+      role: 'Junior Engineer',
     },
     mentee: {
       id: 'EMP013',
       name: 'Michael Wong',
-      role: 'Senior Developer',
+      role: 'Intern Frontend Developer',
     },
     startDate: '2025-07-01',
     focusAreas: ['Team Management', 'Stakeholder Communication'],

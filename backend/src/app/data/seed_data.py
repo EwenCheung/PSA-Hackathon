@@ -503,17 +503,24 @@ def load_course_skills(conn):
 def load_mentorship_profiles(conn):
     data = load_json_file(get_seeds_dir() / "mentorship_profiles.json")
     c = conn.cursor()
+    inserted = 0
     for r in data:
+        employee_id = r["employee_id"]
+        exists = c.execute("SELECT 1 FROM employees WHERE id = ?", (employee_id,)).fetchone()
+        if not exists:
+            print(f"⚠️ Skipping mentorship profile for missing employee {employee_id}")
+            continue
         c.execute("""
             INSERT OR REPLACE INTO mentorship_profiles
             (employee_id, is_mentor, capacity, mentees_count, rating, personality)
             VALUES (?, ?, ?, ?, ?, ?)
         """, (
-            r["employee_id"], r["is_mentor"], r["capacity"],
+            employee_id, r["is_mentor"], r["capacity"],
             r["mentees_count"], r["rating"], r["personality"]
         ))
+        inserted += 1
     conn.commit()
-    print(f"✅ Loaded {len(data)} mentorship profiles")
+    print(f"✅ Loaded {inserted} mentorship profiles")
 
 def load_marketplace_items(conn):
     data = load_json_file(get_seeds_dir() / "marketplace_items.json")
@@ -533,11 +540,20 @@ def load_marketplace_items(conn):
 def load_goals(conn):
     data = load_json_file(get_seeds_dir() / "goals.json")
     c = conn.cursor()
+    inserted = 0
     for r in data:
-        c.execute("INSERT INTO goals (employee_id, title, target_date, progress_percent) VALUES (?, ?, ?, ?)",
-                  (r["employee_id"], r["title"], r["target_date"], r["progress_percent"]))
+        employee_id = r["employee_id"]
+        exists = c.execute("SELECT 1 FROM employees WHERE id = ?", (employee_id,)).fetchone()
+        if not exists:
+            print(f"⚠️ Skipping goal for missing employee {employee_id}")
+            continue
+        c.execute(
+            "INSERT INTO goals (employee_id, title, target_date, progress_percent) VALUES (?, ?, ?, ?)",
+            (employee_id, r["title"], r["target_date"], r["progress_percent"]),
+        )
+        inserted += 1
     conn.commit()
-    print(f"✅ Loaded {len(data)} goals")
+    print(f"✅ Loaded {inserted} goals")
 
 # ========================================
 # Employee Insights Generation

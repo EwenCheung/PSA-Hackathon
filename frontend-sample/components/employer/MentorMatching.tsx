@@ -23,7 +23,7 @@ const mentors = [
   {
     id: 'EMP005',
     name: 'David Lee',
-    role: 'Principal Engineer',
+    role: 'Junior Engineer',
     expertise: ['System Design', 'Cloud Architecture', 'Leadership'],
     mentees: 3,
     capacity: 3,
